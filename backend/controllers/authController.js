@@ -1,0 +1,232 @@
+import asyncHandler from 'express-async-handler';
+import { validationResult } from 'express-validator';
+import User from '../models/User.js';
+import crypto from 'crypto';
+import generateToken from '../utils/generateToken.js';
+import { sendPasswordResetEmail } from '../services/emailService.js';
+
+// @desc    Register admin (only if no admin exists)
+// @route   POST /api/auth/register-admin
+// @access  Public (but only works once)
+const registerAdmin = asyncHandler(async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    res.status(400);
+    throw new Error(errors.array()[0].msg);
+  }
+
+  // Check if admin already exists
+  const existingAdmin = await User.findOne({ role: 'admin' });
+  if (existingAdmin) {
+    res.status(400);
+    throw new Error('Admin already exists. Please login.');
+  }
+
+  const { email, password, fullName } = req.body;
+
+  // Check if user exists
+  const userExists = await User.findOne({ email });
+  if (userExists) {
+    res.status(400);
+    throw new Error('Admin with this email already exists');
+  }
+
+  // Create admin user
+  const user = await User.create({
+    email,
+    password,
+    role: 'admin',
+  });
+
+  if (user) {
+    res.status(201).json({
+      success: true,
+      data: {
+        _id: user._id,
+        email: user.email,
+        role: user.role,
+        token: generateToken(user._id),
+      },
+    });
+  } else {
+    res.status(400);
+    throw new Error('Invalid admin data');
+  }
+});
+
+// @desc    Login admin
+// @route   POST /api/auth/login
+// @access  Public
+const login = asyncHandler(async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    res.status(400);
+    throw new Error(errors.array()[0].msg);
+  }
+
+  const { email, password } = req.body;
+
+  // Check for admin user
+  const user = await User.findOne({ email, role: 'admin' }).select('+password');
+
+  if (user && (await user.matchPassword(password))) {
+    if (!user.isActive) {
+      res.status(401);
+      throw new Error('Account is inactive. Contact system administrator.');
+    }
+
+    res.json({
+      success: true,
+      data: {
+        _id: user._id,
+        email: user.email,
+        role: user.role,
+        token: generateToken(user._id),
+      },
+    });
+  } else {
+    res.status(401);
+    throw new Error('Invalid email or password');
+  }
+});
+
+// @desc    Get current admin
+// @route   GET /api/auth/me
+// @access  Private/Admin
+const getMe = asyncHandler(async (req, res) => {
+  res.json({
+    success: true,
+    data: {
+      _id: req.user._id,
+      email: req.user.email,
+      role: req.user.role,
+      isActive: req.user.isActive,
+      createdAt: req.user.createdAt,
+      updatedAt: req.user.updatedAt,
+    },
+  });
+});
+
+// @desc    Update admin profile
+// @route   PUT /api/auth/profile
+// @access  Private/Admin
+const updateProfile = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+
+  if (user) {
+    user.email = req.body.email || user.email;
+
+    const updatedUser = await user.save();
+
+    res.json({
+      success: true,
+      data: {
+        _id: updatedUser._id,
+        email: updatedUser.email,
+        role: updatedUser.role,
+      },
+    });
+  } else {
+    res.status(404);
+    throw new Error('Admin not found');
+  }
+});
+
+// @desc    Change password
+// @route   PUT /api/auth/change-password
+// @access  Private/Admin
+const changePassword = asyncHandler(async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+
+  const user = await User.findById(req.user._id).select('+password');
+
+  if (user && (await user.matchPassword(currentPassword))) {
+    user.password = newPassword;
+    await user.save();
+
+    res.json({
+      success: true,
+      message: 'Password changed successfully',
+    });
+  } else {
+    res.status(401);
+    throw new Error('Current password is incorrect');
+  }
+});
+
+// @desc    Forgot password
+// @route   POST /api/auth/forgot-password
+// @access  Public
+const forgotPassword = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+
+  const user = await User.findOne({ email, role: 'admin' });
+  if (!user) {
+    res.status(404);
+    throw new Error('No admin found with this email');
+  }
+
+  // Generate reset token
+  const resetToken = crypto.randomBytes(20).toString('hex');
+  user.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+  user.passwordResetExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+
+  await user.save();
+
+  try {
+    await sendPasswordResetEmail(user.email, resetToken);
+    res.json({
+      success: true,
+      message: 'Password reset email sent',
+    });
+  } catch (error) {
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    await user.save();
+    res.status(500);
+    throw new Error('Email could not be sent');
+  }
+});
+
+// @desc    Reset password
+// @route   POST /api/auth/reset-password/:resetToken
+// @access  Public
+const resetPassword = asyncHandler(async (req, res) => {
+  const { resetToken } = req.params;
+  const { password } = req.body;
+
+  // Hash token and compare
+  const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+
+  const user = await User.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetExpires: { $gt: Date.now() },
+    role: 'admin',
+  }).select('+password');
+
+  if (!user) {
+    res.status(400);
+    throw new Error('Invalid or expired reset token');
+  }
+
+  // Set new password
+  user.password = password;
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+  await user.save();
+
+  res.json({
+    success: true,
+    message: 'Password reset successful',
+  });
+});
+
+export {
+  registerAdmin,
+  login,
+  getMe,
+  updateProfile,
+  changePassword,
+  forgotPassword,
+  resetPassword,
+};
