@@ -11,24 +11,10 @@
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "https://your-backend-url.vercel.app/api/$1"
-    },
-    {
       "src": "/(.*)",
       "dest": "/index.html"
     }
   ],
-  "env": {
-    "VITE_API_BASE_URL": "https://your-backend-url.vercel.app",
-    "VITE_CLOUDINARY_CLOUD_NAME": "dscjlhgax",
-    "VITE_CLOUDINARY_UPLOAD_PRESET": "booseere-member-image"
-  },
-  "functions": {
-    "src/pages/api/**/*.js": {
-      "runtime": "nodejs18.x"
-    }
-  },
   "headers": [
     {
       "source": "/(.*)",
