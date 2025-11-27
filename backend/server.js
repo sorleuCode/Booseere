@@ -44,6 +44,9 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Serverless function is running' });
 });
 
+app.get('/', (req, res) => {
+  res.send('Backend server is running');
+});
 // Error handler
 app.use(errorHandler);
 
