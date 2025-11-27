@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useMembers } from '../../context/MembersContext';
 import { uploadToCloudinary } from '../../services/cloudinaryService';
+import { adminAPI } from '../../api/admin';
 import LoadingSpinner from '../UI/LoadingSpinner';
 import './Admindash.css';
 
@@ -16,13 +17,15 @@ function FullAdminDashboard() {
 
   // Dashboard Stats (Editable)
   const [dashboardStats, setDashboardStats] = useState({
-    totalMembers: 500,
-    totalSavings: 25000000,
-    totalLoans: 5000000,
-    activeMembers: 450
+    totalMembers: 0,
+    totalSavings: 0,
+    totalLoans: 0,
+    activeMembers: 0
   });
 
   const [tempStats, setTempStats] = useState({...dashboardStats});
+
+    const [statsLoading, setStatsLoading] = useState(true);
 
   // Admin Notes History
   const [noteHistory, setNoteHistory] = useState([

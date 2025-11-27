@@ -35,7 +35,7 @@ export const MembersProvider = ({ children }) => {
       setLoading(true);
       setError(null);
       const membersData = await getMembers(); // API call
-      setMembers(membersData);
+      setMembers(membersData.data);
     } catch (err) {
       setError(err.message || 'Failed to load members');
       console.error('Error loading members:', err);

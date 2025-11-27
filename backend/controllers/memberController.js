@@ -245,6 +245,105 @@ const getMemberStatsById = asyncHandler(async (req, res) => {
   });
 });
 
+
+// @desc    Add loan to a member (Admin only)
+// @route   POST /api/members/:id/loans
+// @access  Private/Admin
+const addLoanToMember = asyncHandler(async (req, res) => {
+  const memberId = req.params.id;
+  const {
+    loanAmount,
+    interestRate = 0,
+    purpose,
+    dueDate,
+    guarantors = [],
+    notes
+  } = req.body;
+
+  // 1. Validate member
+  const member = await Member.findById(memberId);
+  if (!member) {
+    res.status(404);
+    throw new Error('Member not found');
+  }
+
+  // 2. Calculate totals
+  const totalAmount = loanAmount + (loanAmount * (interestRate / 100));
+
+  // 3. Create loan record
+  const loan = await Loan.create({
+    memberId,
+    loanAmount,
+    interestRate,
+    totalAmount,
+    purpose,
+    dueDate,
+    guarantors,
+    notes,
+    status: 'approved', // Auto-approve for admin
+    approvalDate: new Date()
+  });
+
+  // 4. Update member financials 
+  member.totalLoans += totalAmount;
+  member.outstandingLoan += totalAmount;
+  await member.save();
+
+  res.status(201).json({
+    success: true,
+    message: 'Loan added successfully',
+    data: loan
+  });
+});
+
+
+// @desc    Get public members list (no authentication required)
+// @route   GET /api/members/public
+// @access  Public
+const getPublicMembers = asyncHandler(async (req, res) => {
+  const { position, search } = req.query;
+  
+  let query = { status: 'active' };
+
+  if (position) {
+    if (position === 'exco') {
+      query.position = { $ne: 'Member' };
+    } else {
+      query.position = position;
+    }
+  }
+
+  // ✅ Search filter
+  if (search) {
+    query.$or = [
+      { fullName: { $regex: search, $options: 'i' } },
+      { membershipNumber: { $regex: search, $options: 'i' } },
+      { phone: { $regex: search, $options: 'i' } },
+      { address: { $regex: search, $options: 'i' } },
+    ];
+  }
+
+  const members = await Member.find(query)
+    .select('fullName position phone address profileImage membershipNumber status')
+    .sort({ position: 1, fullName: 1 });
+
+  const publicMembers = members.map(member => ({
+    name: member.fullName,
+    position: member.position,
+    phone: member.phone,
+    address: member.address,
+    image: member.profileImage || '/placeholder-member.jpg',
+    membershipNumber: member.membershipNumber,
+    status: member.status
+  }));
+
+  res.json({
+    success: true,
+    count: publicMembers.length,
+    data: publicMembers
+  });
+});
+
 export {
   getMembers,
   getMember,
@@ -253,4 +352,6 @@ export {
   deleteMember,
   getMemberStats,
   getMemberStatsById,
+  addLoanToMember,
+  getPublicMembers,
 };

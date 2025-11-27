@@ -40,7 +40,7 @@ export const loanAPI = {
 
   // Record Loan Payment
   recordPayment: async (id, paymentData) => {
-    const response = await api.post(`/loans/${id}/payment`, paymentData);
+    const response = await api.post(`/loans/${id}/repayment`, paymentData);
     return response.data;
   },
 

@@ -5,6 +5,7 @@ import Homepage from "./Components/Homepage/Homepage";
 import Login from "./Components/Login/Login";
 import Register from "./Components/Register/Register";
 import Admin from "./Components/AdminPage/Admindash";
+import ProtectedRoute from "./components/ProtectedRoute";
 import Onetofive from "./Components/Constitution/Onetofive";
 import Members from "./Components/Memberpage/Members";
 import { AuthProvider } from "./context/AuthContext";
@@ -19,7 +20,7 @@ function App() {
         <Route path="/" element={<Homepage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/regg" element={<Register />} />
-        <Route path="/admin" element={<Admin />} />
+        <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
         <Route path="/one" element={<Onetofive />} />
         <Route path="/members" element={<Members />} />
       </Routes>

@@ -2,10 +2,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authAPI } from '../../api/auth';
+import { useAuth } from '../../context/AuthContext';
 import './Register.css';
 
 function AdminRegister() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -50,7 +52,8 @@ function AdminRegister() {
       });
       
       // Store the JWT token from backend
-      localStorage.setItem('adminToken', response.data.token);
+      // Use AuthContext to handle login
+        login(response.data.user || { email: formData.email }, response.data.token);
       navigate('/admin');
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed. Please try again.');

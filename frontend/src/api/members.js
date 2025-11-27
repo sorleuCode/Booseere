@@ -26,6 +26,12 @@ export const memberAPI = {
     return response.data;
   },
 
+  // Get public members (no authentication)
+  getPublicMembers: async (params = {}) => {
+    const response = await api.get('/members/public', { params });
+    return response.data;
+  },
+
   // Delete a member
   delete: async (id) => {
     const response = await api.delete(`/members/${id}`);
@@ -45,3 +51,4 @@ export const addMember = memberAPI.create;
 export const updateMember = memberAPI.update;
 export const deleteMember = memberAPI.delete;
 export const addLoanRecord = memberAPI.addLoanRecord;
+export const getPublicMembers = memberAPI.getPublicMembers;

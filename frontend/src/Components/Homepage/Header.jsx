@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import "./Header.css";
 
 function Header() {
@@ -17,12 +18,12 @@ function Header() {
         <div className="header-logo">Booseere</div>
 
         <nav className={`header-nav ${menuOpen ? "header-nav-active" : ""}`}>
-          <a className="header-link" href="/">Home</a>
-          <a className="header-link" href="/#aboutus">About Us</a>
-          <a className="header-link" href="/members">Members</a>
-          <a className="header-link" href="/one">Law</a>
-          <a className="header-link" href="/#benefits">Benefits</a>
-          <a className="header-link" href="/#contact">Contact Me</a>
+          <Link className="header-link" to="/">Home</Link>
+          <Link className="header-link" href="/#aboutus">About Us</Link>
+          <Link className="header-link" to="/members">Members</Link>
+          <Link className="header-link" href="/one">Law</Link>
+          <Link className="header-link" href="/#benefits">Benefits</Link>
+          <Link className="header-link" href="/#contact">Contact Me</Link>
         </nav>
 
         <div
