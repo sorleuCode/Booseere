@@ -57,4 +57,3 @@ export const addMember = memberAPI.create;
 export const updateMember = memberAPI.update;
 export const deleteMember = memberAPI.delete;
 export const getPublicMembers = memberAPI.getPublicMembers;
-export const addLoanRecord = memberAPI.addLoanRecord;

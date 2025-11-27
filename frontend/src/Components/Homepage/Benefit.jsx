@@ -49,56 +49,6 @@ function BenefitsSection() {
     }
   ];
 
-  const membershipTiers = [
-    {
-      name: 'Basic',
-      price: '$20',
-      period: 'per month',
-      description: 'Perfect for getting started',
-      features: [
-        'Emergency fund access up to $2,000',
-        'Community support network',
-        'Monthly updates and reports',
-        'Basic voting rights',
-        'Access to member events'
-      ],
-      popular: false,
-      color: '#667eea'
-    },
-    {
-      name: 'Standard',
-      price: '$50',
-      period: 'per month',
-      description: 'Most popular choice',
-      features: [
-        'Emergency fund access up to $5,000',
-        'Priority processing (24hrs)',
-        'All Basic features included',
-        'Full voting rights',
-        'Discounted business loans',
-        'Free financial counseling'
-      ],
-      popular: true,
-      color: '#764ba2'
-    },
-    {
-      name: 'Premium',
-      price: '$100',
-      period: 'per month',
-      description: 'Maximum support and benefits',
-      features: [
-        'Emergency fund access up to $10,000',
-        'Instant processing (12hrs)',
-        'All Standard features included',
-        'Leadership opportunities',
-        'Investment opportunities',
-        'Personal financial advisor',
-        'Exclusive networking events'
-      ],
-      popular: false,
-      color: '#f093fb'
-    }
-  ];
 
   return (
     <section className="benefits-section" id="benefits">

@@ -13,5 +13,4 @@ export {
   addMember,
   updateMember,
   deleteMember,
-  addLoanRecord,
 } from './members';

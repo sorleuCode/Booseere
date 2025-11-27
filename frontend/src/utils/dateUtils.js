@@ -28,18 +28,6 @@ export const formatDate = (dateString) => {
   });
 };
 
-export const formatTime = (dateString) => {
-  if (!dateString) return 'N/A';
-
-  const date = new Date(dateString);
-  if (isNaN(date.getTime())) return 'Invalid Date';
-
-  return date.toLocaleTimeString('en-US', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true
-  });
-};
 
 export const formatRelativeTime = (dateString) => {
   if (!dateString) return 'N/A';
