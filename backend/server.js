@@ -4,19 +4,16 @@ import cors from 'cors';
 import connectDB from './config/db.js';
 import { errorHandler } from './middleware/errorMiddleware.js';
 
-// Routes
-import authRoutes from './routes/authRoutes.js';
-import memberRoutes from './routes/memberRoutes.js';
-import contributionRoutes from './routes/contributionRoutes.js';
-import loanRoutes from './routes/loanRoutes.js';
-import adminRoutes from './routes/adminRoutes.js';
-import contactRoutes from './routes/contactRoutes.js';
-
-// Load env variables
+// Load environment variables
 dotenv.config();
 
-// Initialize app
+// Connect to MongoDB (with error handling)
+connectDB().catch(err => {
+  console.log('MongoDB connection failed, starting server without database...');
+});
+
 const app = express();
+
 
 // Middleware
 app.use(cors({
@@ -26,12 +23,14 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Connect to MongoDB (cached for serverless)
-await connectDB().catch(err => {
-  console.error('MongoDB connection failed:', err.message);
-});
-
 // Routes
+import authRoutes from './routes/authRoutes.js';
+import memberRoutes from './routes/memberRoutes.js';
+import contributionRoutes from './routes/contributionRoutes.js';
+import loanRoutes from './routes/loanRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
+import contactRoutes from './routes/contactRoutes.js';
+
 app.use('/api/auth', authRoutes);
 app.use('/api/members', memberRoutes);
 app.use('/api/contributions', contributionRoutes);
@@ -39,16 +38,22 @@ app.use('/api/loans', loanRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/contact', contactRoutes);
 
-// Health check
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'Serverless function is running' });
-});
 
 app.get('/', (req, res) => {
   res.send('Backend server is running');
 });
+// Health check
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'OK', message: 'Server is running' });
+});
+
+
 // Error handler
 app.use(errorHandler);
 
+const PORT = process.env.PORT || 5000;
 
-export default app;
+app.listen(PORT, () => {
+  console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+});
+
