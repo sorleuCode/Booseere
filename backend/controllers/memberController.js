@@ -2,6 +2,7 @@ import asyncHandler from 'express-async-handler';
 import Member from '../models/Member.js';
 import Contribution from '../models/Contribution.js';
 import Loan from '../models/Loan.js';
+import { sendWelcomeEmail } from '../services/emailService.js';
 
 // @desc    Get all members (Admin only)
 // @route   GET /api/members
@@ -107,6 +108,22 @@ const createMember = asyncHandler(async (req, res) => {
     status: 'active',
     joinDate: new Date(),
   });
+
+  // Send welcome email asynchronously (don't block member creation)
+  if (process.env.ENABLE_EMAILS !== 'false') {
+    setImmediate(async () => {
+      try {
+        console.log(`Sending welcome email to ${email} (${fullName}) with membership ${membershipNumber}...`);
+        const emailResult = await sendWelcomeEmail(email, fullName, membershipNumber);
+        console.log('Welcome email sent successfully:', emailResult);
+      } catch (emailError) {
+        console.error('Failed to send welcome email (async):', emailError);
+        // Email failure doesn't affect member creation
+      }
+    });
+  } else {
+    console.log('Email sending disabled via ENABLE_EMAILS=false');
+  }
 
   res.status(201).json({
     success: true,
@@ -328,13 +345,12 @@ const getPublicMembers = asyncHandler(async (req, res) => {
     .sort({ position: 1, fullName: 1 });
 
   const publicMembers = members.map(member => ({
-    name: member.fullName,
+    fullName: member.fullName,
     position: member.position,
-    phone: member.phone,
-    address: member.address,
-    image: member.profileImage || '/placeholder-member.jpg',
+    profileImage: member.profileImage || '/placeholder-member.jpg',
     membershipNumber: member.membershipNumber,
-    status: member.status
+    status: member.status,
+    joinDate: member.joinDate
   }));
 
   res.json({

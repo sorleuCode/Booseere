@@ -4,7 +4,7 @@ import './HeroSection.css';
 
 function HeroSection() {
   const [currentWord, setCurrentWord] = useState(0);
-  const words = [];
+  const words = ['COOPERATIVE', 'COMMUNITY', 'SUPPORT', 'NETWORK'];
 
   useEffect(() => {
     const interval = setInterval(() => {

@@ -26,7 +26,8 @@ router.get('/stats', protect, admin, getMemberStats);
 router.get('/:id', protect, admin, getMember);
 router.put('/:id', protect, admin, updateMember);
 router.delete('/:id', protect, admin, deleteMember);
-router.get('/:id', getMemberStatsById);
-router.post('/:id/loans', protect, admin, addLoanToMember);
+router.get('/:id/stats', protect, admin, getMemberStatsById);
+// Note: Loans should be created via /api/loans, not /api/members/:id/loans
+// router.post('/:id/loans', protect, admin, addLoanToMember); // DEPRECATED
 
 export default router;

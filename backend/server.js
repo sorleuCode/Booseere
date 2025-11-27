@@ -14,6 +14,7 @@ connectDB().catch(err => {
 
 const app = express();
 
+
 // Middleware
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:5173',
@@ -27,13 +28,18 @@ import authRoutes from './routes/authRoutes.js';
 import memberRoutes from './routes/memberRoutes.js';
 import contributionRoutes from './routes/contributionRoutes.js';
 import loanRoutes from './routes/loanRoutes.js';
-import adminRoutes from './routes/adminRoutes.js';
+import adminRoutes, { testEmailRouter } from './routes/adminRoutes.js';
+import contactRoutes from './routes/contactRoutes.js';
 
 app.use('/api/auth', authRoutes);
 app.use('/api/members', memberRoutes);
 app.use('/api/contributions', contributionRoutes);
 app.use('/api/loans', loanRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/contact', contactRoutes);
+
+// Public test email endpoint (for debugging)
+app.use('/api', testEmailRouter);
 
 // Health check
 app.get('/api/health', (req, res) => {

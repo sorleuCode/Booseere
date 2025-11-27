@@ -38,6 +38,12 @@ export const loanAPI = {
     return response.data;
   },
 
+  // Disburse Loan
+  disburse: async (id) => {
+    const response = await api.put(`/loans/${id}/disburse`);
+    return response.data;
+  },
+
   // Record Loan Payment
   recordPayment: async (id, paymentData) => {
     const response = await api.post(`/loans/${id}/repayment`, paymentData);
@@ -47,6 +53,12 @@ export const loanAPI = {
   // Get Loans by Member
   getByMember: async (memberId) => {
     const response = await api.get(`/loans/member/${memberId}`);
+    return response.data;
+  },
+
+  // Get Single Loan
+  getById: async (id) => {
+    const response = await api.get(`/loans/${id}`);
     return response.data;
   },
 };

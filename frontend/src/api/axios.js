@@ -28,8 +28,17 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('adminToken');
-      window.location.href = '/login';
+      // Only redirect to login if we're not already on a public page
+      const currentPath = window.location.pathname;
+      const publicPaths = ['/', '/login', '/register', '/forgot-password', '/reset-password', '/public-members', '/constitution', '/law'];
+
+      if (!publicPaths.includes(currentPath)) {
+        // Clear all auth data on unauthorized
+        localStorage.removeItem('adminToken');
+        localStorage.removeItem('adminUser');
+        // Use window.location for immediate redirect to avoid state issues
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }

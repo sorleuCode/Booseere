@@ -44,17 +44,28 @@ const getLoan = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Apply for loan
+// @desc    Apply for loan (members) or create loan (admin)
 // @route   POST /api/loans
 // @access  Private
 const applyLoan = asyncHandler(async (req, res) => {
-  const { loanAmount, purpose, interestRate, guarantors } = req.body;
+  const { loanAmount, purpose, interestRate, guarantors, memberId } = req.body;
 
-  // Get member profile
-  const member = await Member.findOne({ userId: req.user._id });
-  if (!member) {
-    res.status(404);
-    throw new Error('Member profile not found');
+  let member;
+
+  // If memberId is provided (admin creating loan for member), use that
+  if (memberId) {
+    member = await Member.findById(memberId);
+    if (!member) {
+      res.status(404);
+      throw new Error('Member not found');
+    }
+  } else {
+    // Regular member applying for loan
+    member = await Member.findOne({ userId: req.user._id });
+    if (!member) {
+      res.status(404);
+      throw new Error('Member profile not found');
+    }
   }
 
   // Calculate total amount with interest

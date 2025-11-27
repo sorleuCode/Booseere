@@ -1,5 +1,6 @@
 // components/HowItWorksSection.js
 import React from 'react';
+import { Link } from 'react-router-dom';
 import './Howitwork.css';
 
 function HowItWorksSection() {
@@ -116,12 +117,12 @@ function HowItWorksSection() {
             </div>
           </div>
 
-          <button className="info-button">
+          <Link to="/constitution" className="info-button">
             Our Laws
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
               <path d="M7 4L13 10L7 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
-          </button>
+          </Link>
         </div>
 
       </div>

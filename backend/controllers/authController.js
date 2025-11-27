@@ -114,7 +114,11 @@ const updateProfile = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
 
   if (user) {
-    user.email = req.body.email || user.email;
+    // Update allowed fields
+    if (req.body.username !== undefined) user.username = req.body.username;
+    if (req.body.email !== undefined) user.email = req.body.email;
+    if (req.body.fullName !== undefined) user.fullName = req.body.fullName;
+    if (req.body.phone !== undefined) user.phone = req.body.phone;
 
     const updatedUser = await user.save();
 
@@ -122,8 +126,12 @@ const updateProfile = asyncHandler(async (req, res) => {
       success: true,
       data: {
         _id: updatedUser._id,
+        username: updatedUser.username,
         email: updatedUser.email,
+        fullName: updatedUser.fullName,
+        phone: updatedUser.phone,
         role: updatedUser.role,
+        isActive: updatedUser.isActive,
       },
     });
   } else {

@@ -18,13 +18,13 @@ function Header() {
         <div className="header-logo">Booseere</div>
 
         <nav className={`header-nav ${menuOpen ? "header-nav-active" : ""}`}>
-          <Link className="header-link" to="/">Home</Link>
-          <Link className="header-link" href="/#aboutus">About Us</Link>
-          <Link className="header-link" to="/members">Members</Link>
-          <Link className="header-link" href="/one">Law</Link>
-          <Link className="header-link" href="/#benefits">Benefits</Link>
-          <Link className="header-link" href="/#contact">Contact Me</Link>
-        </nav>
+           <Link className="header-link" to="/">Home</Link>
+           <a className="header-link" href="/#aboutus">About Us</a>
+           <Link className="header-link" to="/public-members">Members</Link>
+           <Link className="header-link" to="/constitution">Law</Link>
+           <a className="header-link" href="/#benefits">Benefits</a>
+           <a className="header-link" href="/#contact">Contact</a>
+         </nav>
 
         <div
           className={`header-toggle ${menuOpen ? "header-toggle-open" : ""}`}

@@ -38,9 +38,15 @@ export const memberAPI = {
     return response.data;
   },
 
-  // Add loan record for a member
-  addLoanRecord: async (memberId, loanData) => {
-    const response = await api.post(`/members/${memberId}/loans`, loanData);
+  // Get member statistics
+  getStats: async () => {
+    const response = await api.get('/members/stats');
+    return response.data;
+  },
+
+  // Get member statistics by ID
+  getStatsById: async (id) => {
+    const response = await api.get(`/members/${id}/stats`);
     return response.data;
   },
 };
@@ -50,5 +56,5 @@ export const getMembers = memberAPI.getAll;
 export const addMember = memberAPI.create;
 export const updateMember = memberAPI.update;
 export const deleteMember = memberAPI.delete;
-export const addLoanRecord = memberAPI.addLoanRecord;
 export const getPublicMembers = memberAPI.getPublicMembers;
+export const addLoanRecord = memberAPI.addLoanRecord;

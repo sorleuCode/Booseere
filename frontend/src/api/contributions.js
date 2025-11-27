@@ -8,6 +8,12 @@ export const contributionAPI = {
     return response.data;
   },
 
+  // Get Single Contribution
+  getById: async (id) => {
+    const response = await api.get(`/contributions/${id}`);
+    return response.data;
+  },
+
   // Add Contribution
   add: async (contributionData) => {
     const response = await api.post('/contributions', contributionData);

@@ -22,9 +22,17 @@ const userSchema = new mongoose.Schema({
     minlength: 6,
     select: false,
   },
+  fullName: {
+    type: String,
+    trim: true,
+  },
+  phone: {
+    type: String,
+    trim: true,
+  },
   role: {
     type: String,
-    enum: ['admin'],
+    enum: ['admin', 'member'],
     default: 'admin',
   },
   isActive: {
@@ -40,6 +48,10 @@ const userSchema = new mongoose.Schema({
     select: false,
   },
   createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
     type: Date,
     default: Date.now,
   },

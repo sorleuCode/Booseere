@@ -1,5 +1,6 @@
 // components/ContactSection.js
 import React, { useState } from 'react';
+import { contactAPI } from '../../api/contact';
 import './Contact.css';
 
 function ContactSection() {
@@ -12,6 +13,7 @@ function ContactSection() {
   });
 
   const [formStatus, setFormStatus] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -20,14 +22,28 @@ function ContactSection() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Add your form submission logic here
-    setFormStatus('success');
-    setTimeout(() => {
-      setFormStatus('');
-      setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
-    }, 3000);
+    setIsSubmitting(true);
+    setFormStatus('');
+
+    try {
+      const response = await contactAPI.submit(formData);
+      if (response.success) {
+        setFormStatus('success');
+        setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
+      } else {
+        setFormStatus('error');
+      }
+    } catch (error) {
+      console.error('Contact form submission failed:', error);
+      setFormStatus('error');
+    } finally {
+      setIsSubmitting(false);
+      setTimeout(() => {
+        setFormStatus('');
+      }, 5000);
+    }
   };
 
   const contactInfo = [
@@ -167,8 +183,8 @@ function ContactSection() {
                 ></textarea>
               </div>
 
-              <button type="submit" className="submit-button">
-                Send Message
+              <button type="submit" className="submit-button" disabled={isSubmitting}>
+                {isSubmitting ? 'Sending...' : 'Send Message'}
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                   <path d="M2 10L18 2L10 18L8 11L2 10Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
@@ -177,6 +193,12 @@ function ContactSection() {
               {formStatus === 'success' && (
                 <div className="form-success">
                   ✓ Message sent successfully! We'll get back to you soon.
+                </div>
+              )}
+
+              {formStatus === 'error' && (
+                <div className="form-error">
+                  ❌ Failed to send message. Please try again or contact us directly.
                 </div>
               )}
             </form>

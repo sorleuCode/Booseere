@@ -1,8 +1,7 @@
 // pages/SimpleLogin.js
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { authAPI } from '../../api/auth';
 import './Login.css';
 
 function Login() {
@@ -30,12 +29,14 @@ function Login() {
     setError('');
 
     try {
-      // Connect to Version 2 backend API
-      const response = await authAPI.login(formData);
-      
-      // Use Auth Context to handle login
-      login(response.data.user || { email: formData.email }, response.data.token);
-      navigate('/admin');
+      // Use Auth Context to handle login (it makes the API call internally)
+      const result = await login(formData);
+
+      if (result.success) {
+        navigate('/admin');
+      } else {
+        setError(result.message || 'Login failed. Please try again.');
+      }
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed. Please try again.');
     } finally {
@@ -126,11 +127,15 @@ function Login() {
             )}
           </button>
 
+          <div className="forgot-password-link">
+            <Link to="/forgot-password">Forgot Password?</Link>
+          </div>
+
         </form>
 
         {/* Footer */}
         <div className="login-footer">
-          <a href="/regg">Create Account</a>
+          <a href="/register">Create Account</a>
           <a href="/">Go to Homepage</a>
         </div>
 
