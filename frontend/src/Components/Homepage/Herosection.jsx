@@ -1,6 +1,6 @@
 // components/HeroSection.js
 import React, { useState, useEffect } from 'react';
-import './HeroSection.css';
+import './Herosection.css';
 
 function HeroSection() {
   const [currentWord, setCurrentWord] = useState(0);
