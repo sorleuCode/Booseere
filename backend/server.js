@@ -4,16 +4,19 @@ import cors from 'cors';
 import connectDB from './config/db.js';
 import { errorHandler } from './middleware/errorMiddleware.js';
 
+// Routes
+import authRoutes from './routes/authRoutes.js';
+import memberRoutes from './routes/memberRoutes.js';
+import contributionRoutes from './routes/contributionRoutes.js';
+import loanRoutes from './routes/loanRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
+import contactRoutes from './routes/contactRoutes.js';
+
 // Load environment variables
 dotenv.config();
 
-// Connect to MongoDB (with error handling)
-connectDB().catch(err => {
-  console.log('MongoDB connection failed, starting server without database...');
-});
-
+// Initialize app
 const app = express();
-
 
 // Middleware
 app.use(cors({
@@ -23,14 +26,12 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Routes
-import authRoutes from './routes/authRoutes.js';
-import memberRoutes from './routes/memberRoutes.js';
-import contributionRoutes from './routes/contributionRoutes.js';
-import loanRoutes from './routes/loanRoutes.js';
-import adminRoutes from './routes/adminRoutes.js';
-import contactRoutes from './routes/contactRoutes.js';
+// Connect to MongoDB (cached for serverless)
+await connectDB().catch(err => {
+  console.error('MongoDB connection failed:', err.message);
+});
 
+// Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/members', memberRoutes);
 app.use('/api/contributions', contributionRoutes);
@@ -38,22 +39,17 @@ app.use('/api/loans', loanRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/contact', contactRoutes);
 
-
-app.get('/', (req, res) => {
-  res.send('Backend server is running');
-});
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'Server is running' });
+  res.json({ status: 'OK', message: 'Serverless function is running' });
 });
 
+// Root route redirect to health check
+app.get('/', (req, res) => {
+  res.redirect('/api/health');
+});
 
 // Error handler
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
-
-app.listen(PORT, () => {
-  console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
-});
-
+export default app;
