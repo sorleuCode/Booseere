@@ -8,15 +8,8 @@
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "/server.js"
+      "src": "/(.*)",
+      "dest": "server.js"
     }
-  ],
-  "functions": {
-    "server.js": {
-      "runtime": "nodejs20.x",
-      "maxDuration": 30
-    }
-  }
- 
+  ]
 }
