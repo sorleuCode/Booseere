@@ -309,6 +309,12 @@
     font-size: 1.8rem;
   }
 
+  .contact-section{
+
+position:relative;
+bottom:7rem;
+  }
+
   .section-subtitle {
     font-size: 1rem;
   }

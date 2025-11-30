@@ -57,14 +57,14 @@ function Aboutus() {
             <div className="story-content">
               <h3 className="story-title">Our Story</h3>
               <p className="story-text">
-                Founded in 2019, Unity Cooperative began with a simple vision: to create 
+                Founded in 2022, Booseere Multipurpose began with a simple vision: to create 
                 a safety net where community members could pool resources and support each 
                 other during times of need. What started as a small group of 20 members 
-                has grown into a thriving community of over 500 active participants.
+                has grown into a thriving community of over 80+ active participants.
               </p>
               <p className="story-text">
                 Through regular contributions, emergency funds, and mutual aid, we've helped 
-                members overcome medical emergencies, educational expenses, business setbacks, 
+                members overcome their setbacks, 
                 and unexpected life challenges. Our strength lies in our unity.
               </p>
 
@@ -72,21 +72,21 @@ function Aboutus() {
                 <div className="mini-stat">
                   <div className="mini-stat-icon">👥</div>
                   <div>
-                    <div className="mini-stat-number">500+</div>
+                    <div className="mini-stat-number">90+</div>
                     <div className="mini-stat-label">Members</div>
                   </div>
                 </div>
                 <div className="mini-stat">
                   <div className="mini-stat-icon">💰</div>
                   <div>
-                    <div className="mini-stat-number">$250K+</div>
+                    <div className="mini-stat-number">#100000+</div>
                     <div className="mini-stat-label">Distributed</div>
                   </div>
                 </div>
                 <div className="mini-stat">
                   <div className="mini-stat-icon">🎯</div>
                   <div>
-                    <div className="mini-stat-number">1000+</div>
+                    <div className="mini-stat-number">750+</div>
                     <div className="mini-stat-label">Lives Helped</div>
                   </div>
                 </div>

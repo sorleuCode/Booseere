@@ -48,10 +48,11 @@ const PublicMembers = () => {
   );
 
   return (
+    
     <div className="public-members">
       <div className="public-members-header">
         <h2>👥 Our Members</h2>
-        <p>Meet the active members of our cooperative society</p>
+        <p>Meet the active members of Booseere Multipurpose</p>
         
         <div className="search-filters">
           <div className="search-box">

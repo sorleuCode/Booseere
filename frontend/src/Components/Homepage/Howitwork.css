@@ -2,7 +2,7 @@
 
 .how-it-works-section {
   position: relative;
-  padding: 8rem 2rem;
+  /* padding: 8rem 2rem; */
   background:#f0e6fa1b;
   overflow: hidden;
 }
@@ -511,6 +511,13 @@
   .section-heading {
     font-size: 2rem;
   }
+
+.how-it-works-section {
+  /* margin-bottom: -34rem; */
+  position: relative;
+  bottom:8rem;
+  /* background: #000; */
+}
 
   .step-card {
     padding: 2rem;

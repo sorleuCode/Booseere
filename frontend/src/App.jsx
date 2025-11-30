@@ -37,7 +37,7 @@ function App() {
           <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/public-members" element={<PublicMembers />} />
           <Route path="/constitution" element={<Onetofive />} />
-          <Route path="/law" element={<Law />} />
+          <Route path="/lawS" element={<Law />} />
           {/* Backward compatibility */}
           <Route path="/regg" element={<Register />} />
           <Route path="/one" element={<Onetofive />} />

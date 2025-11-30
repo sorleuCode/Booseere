@@ -1,10 +1,10 @@
 // components/HeroSection.js
 import React, { useState, useEffect } from 'react';
-import './Herosection.css';
+import './HeroSection.css';
 
 function HeroSection() {
   const [currentWord, setCurrentWord] = useState(0);
-  const words = ['COOPERATIVE', 'COMMUNITY', 'SUPPORT', 'NETWORK'];
+  const words = [];
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -56,14 +56,14 @@ function HeroSection() {
 
           {/* Subtitle */}
           <p className="hero-subtitle">
-            Join our cooperative forum where members contribute, donate, and support 
+            Join our cooperative forum where members contribute, accept loans, and support 
             one another. Together, we create a safety net that ensures no one faces 
             life's challenges alone.
           </p>
 
           {/* CTA Buttons */}
           <div className="hero-cta">
-            <button className="btn-primary" onClick={() => scrollToSection('about')}>
+            <button className="btn-primary" onClick={() => scrollToSection('aboutus')}>
               Learn More
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                 <path d="M7 4L13 10L7 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -77,17 +77,17 @@ function HeroSection() {
           {/* Stats */}
           <div className="hero-stats">
             <div className="stat-item">
-              <div className="stat-number">500+</div>
+              <div className="stat-number">90+</div>
               <div className="stat-label">Active Members</div>
             </div>
             <div className="stat-divider"></div>
             <div className="stat-item">
-              <div className="stat-number">$250K+</div>
+              <div className="stat-number">#1000000+</div>
               <div className="stat-label">Total Contributions</div>
             </div>
             <div className="stat-divider"></div>
             <div className="stat-item">
-              <div className="stat-number">1000+</div>
+              <div className="stat-number">750+</div>
               <div className="stat-label">Lives Impacted</div>
             </div>
           </div>
@@ -98,8 +98,8 @@ function HeroSection() {
           <div className="visual-card card-1">
             <div className="card-icon">💰</div>
             <div className="card-content">
-              <h4>Monthly Contributions</h4>
-              <p>Flexible plans from #4440</p>
+              <h4>Biweekly Contributions</h4>
+              <p>Flexible plans from #3,500</p>
             </div>
           </div>
 

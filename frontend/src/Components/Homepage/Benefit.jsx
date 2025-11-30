@@ -8,33 +8,33 @@ function BenefitsSection() {
   const benefits = [
     {
       icon: '🏥',
-      title: 'Emergency Medical Support',
-      description: 'Access funds quickly for unexpected medical expenses, surgeries, or healthcare needs.',
+      title: 'Unique Loan Program',
+      description: ' We offer a unique loan program where the amount you save with usis multiplied by 3 to determine your loan amount',
       stat: '85%',
       statLabel: 'of requests approved',
       color: '#667eea'
     },
     {
-      icon: '🎓',
-      title: 'Education Assistance',
-      description: 'Support for school fees, educational materials, and skill development programs.',
-      stat: '$150K',
-      statLabel: 'in education aid',
+      icon: '📅',
+      title: 'Long-Term Loan',
+      description: 'Our long-term loan has a flexible repayment period of up to 12 months.',
+      stat: '#1000000+',
+      statLabel: 'in loan aid',
       color: '#764ba2'
     },
     {
-      icon: '🏠',
-      title: 'Housing Support',
-      description: 'Help with rent, home repairs, or temporary accommodation during difficult times.',
-      stat: '200+',
+      icon: '⏳',
+      title: 'Basiri, A Short-Term Loan',
+      description: ' Introducing Basiri, our short-term loan option, where collections are made every 15 days and repayment is due at the next meeting, with no interest charges.',
+      stat: '750+',
       statLabel: 'families helped',
       color: '#f093fb'
     },
     {
       icon: '💼',
-      title: 'Business Capital',
-      description: 'Small loans and grants to start or grow your business venture.',
-      stat: '$80K',
+      title: 'Interest-Free Loan',
+      description: ' We provide interest-free financial support to help members grow without the burden of additional costs.',
+      stat: '#2000000+',
       statLabel: 'in business loans',
       color: '#667eea'
     },
