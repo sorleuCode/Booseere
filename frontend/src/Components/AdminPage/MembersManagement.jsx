@@ -158,24 +158,44 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
           photo: uploadResult.secure_url,
           photoPreview: uploadResult.secure_url
         });
+        setUploadProgress(0);
       } catch (error) {
         alert('Failed to upload photo: ' + error.message);
       }
     }
   };
 
-  // Handle Image Upload for Edit Member
-  const handleEditImageUpload = (e) => {
+  // Handle Image Upload for Edit Member with Cloudinary
+  const handleEditImageUpload = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
+      // Validate file
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file');
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Image size should be less than 5MB');
+        return;
+      }
+
+      try {
+        setUploadProgress(0);
+        const uploadResult = await uploadToCloudinary(file, {
+          onProgress: (progress) => setUploadProgress(progress),
+          folder: 'booseere/members'
+        });
+
         setSelectedMember({
           ...selectedMember,
-          photo: reader.result
+          profileImage: uploadResult.secure_url,
+          photo: uploadResult.secure_url,
+          photoPreview: uploadResult.secure_url
         });
-      };
-      reader.readAsDataURL(file);
+        setUploadProgress(0);
+      } catch (error) {
+        alert('Failed to upload photo: ' + error.message);
+      }
     }
   };
 
@@ -216,7 +236,12 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
   const handleEditMemberSubmit = async (e) => {
     e.preventDefault();
     try {
-      await handleUpdateMember(selectedMember._id || selectedMember.id, selectedMember);
+      const updateData = {
+        ...selectedMember,
+        profileImage: selectedMember.profileImage || selectedMember.photo || null
+      };
+      
+      await handleUpdateMember(selectedMember._id || selectedMember.id, updateData);
       setShowEditModal(false);
     } catch (error) {
       console.error('Error updating member:', error);
@@ -518,7 +543,7 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
               <div className="photo-upload-section">
                 <div className="photo-preview">
                   <img 
-                    src={selectedMember.profileImage || defaultPlaceholder} 
+                    src={selectedMember.profileImage || selectedMember.photoPreview || defaultPlaceholder} 
                     alt={selectedMember.fullName} 
                     className="preview-image"
                     onError={(e) => handleImageError(e, selectedMember._id || selectedMember.id)}
@@ -535,6 +560,17 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
                       style={{ display: 'none' }}
                     />
                   </label>
+                  {uploadProgress > 0 && uploadProgress < 100 && (
+                    <div className="upload-progress">
+                      <div className="progress-bar">
+                        <div 
+                          className="progress-fill" 
+                          style={{ width: `${uploadProgress}%` }}
+                        ></div>
+                      </div>
+                      <span className="progress-text">{uploadProgress}%</span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -641,7 +677,34 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
         onCancel={confirmState.onCancel}
       />
 
-
+      <style jsx>{`
+        .upload-progress {
+          margin-top: 12px;
+          padding: 8px;
+          background: #f8fafc;
+          border-radius: 6px;
+          border: 1px solid #e2e8f0;
+        }
+        .progress-bar {
+          width: 100%;
+          height: 6px;
+          background: #e2e8f0;
+          border-radius: 3px;
+          overflow: hidden;
+          margin-bottom: 4px;
+        }
+        .progress-fill {
+          height: 100%;
+          background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+          border-radius: 3px;
+          transition: width 0.3s ease;
+        }
+        .progress-text {
+          font-size: 0.75em;
+          color: #64748b;
+          font-weight: 500;
+        }
+      `}</style>
     </>
   );
 }

@@ -42,8 +42,10 @@ export default function Members() {
   const handleImageError = (e, memberId) => {
     const key = memberId || 'default';
     if (!imageErrorStates[key]) {
+      console.warn(`Failed to load image for member ${key}, using placeholder`);
       setImageErrorStates(prev => ({ ...prev, [key]: true }));
       e.target.src = defaultPlaceholder;
+      e.target.onerror = null; // Prevent infinite loop
     }
   };
 

@@ -327,10 +327,12 @@ const getPublicMembers = asyncHandler(async (req, res) => {
   const publicMembers = members.map(member => ({
     fullName: member.fullName,
     position: member.position,
-    profileImage: member.profileImage || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgZmlsbD0iIzRmOWNmOSIvPjx0ZXh0IHg9Ijc1IiB5PSI3NSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjEyIiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPk1lbWJlcjwvdGV4dD48L3N2Zz4=',
+    profileImage: member.profileImage || '',
     membershipNumber: member.membershipNumber,
     status: member.status,
-    joinDate: member.joinDate
+    joinDate: member.joinDate,
+    phone: member.phone,
+    address: member.address
   }));
 
   res.json({
