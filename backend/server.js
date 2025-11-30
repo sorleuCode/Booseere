@@ -52,4 +52,13 @@ app.get('/', (req, res) => {
 // Error handler
 app.use(errorHandler);
 
+// Start server for local development
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+    console.log(`Health check: http://localhost:${PORT}/api/health`);
+  });
+}
+
 export default app;

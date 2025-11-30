@@ -678,10 +678,6 @@ const ContributionManagement = () => {
             overflow-x: auto;
           }
 
-          table {
-            min-width: 600px;
-          }
-
           th, td {
             padding: 8px 6px;
             font-size: 14px;
@@ -783,10 +779,12 @@ const ContributionManagement = () => {
           border-radius: 8px;
           overflow: hidden;
           box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+          overflow-x: auto;
         }
         table {
           width: 100%;
           border-collapse: collapse;
+          min-width: 800px;
         }
         th, td {
           padding: 12px;

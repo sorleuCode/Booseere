@@ -6,7 +6,7 @@ import { useMembers } from '../../context/MembersContext';
 import DashboardOverview from './DashboardOverview';
 import MembersManagement from './MembersManagement';
 import MessagesManagement from './MessagesManagement';
-import AdminNotesSidebar from './AdminNotesSidebar';
+import AdminNotesManagement from './AdminNotesManagement';
 import './Admindash.css';
 
 function FullAdminDashboard() {
@@ -15,7 +15,7 @@ function FullAdminDashboard() {
   const { members } = useMembers();
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedMember, setSelectedMember] = useState(null);
-  const [notesExpanded, setNotesExpanded] = useState(false);
+
 
   // Save members to localStorage for homepage
   useEffect(() => {
@@ -68,11 +68,10 @@ function FullAdminDashboard() {
     <span className="item-icon">📬</span>
     <span>Messages</span>
   </button>
-
-  <AdminNotesSidebar
-    isExpanded={notesExpanded}
-    onToggle={() => setNotesExpanded(!notesExpanded)}
-  />
+  <button className={`menu-item ${activeTab === 'admin-notes' ? 'active' : ''}`} onClick={() => { setActiveTab('admin-notes'); setSelectedMember(null); }}>
+    <span className="item-icon">📝</span>
+    <span>Admin Notes</span>
+  </button>
 
   <button className="menu-item logout" onClick={handleLogout}>
     <span className="item-icon">🚪</span>
@@ -89,7 +88,8 @@ function FullAdminDashboard() {
           <h1>
             {activeTab === 'overview' ? 'Dashboard Overview' :
              activeTab === 'members' ? 'Members Management' :
-             activeTab === 'messages' ? 'Contact Messages' : 'Settings'}
+             activeTab === 'messages' ? 'Contact Messages' :
+             activeTab === 'admin-notes' ? 'Admin Notes Management' : 'Settings'}
           </h1>
           <div className="top-actions">
             <span className="admin-user">Admin</span>
@@ -100,6 +100,7 @@ function FullAdminDashboard() {
         {activeTab === 'overview' && <DashboardOverview />}
         {activeTab === 'members' && <MembersManagement selectedMember={selectedMember} setSelectedMember={setSelectedMember} />}
         {activeTab === 'messages' && <MessagesManagement />}
+        {activeTab === 'admin-notes' && <AdminNotesManagement />}
 
       </main>
 
