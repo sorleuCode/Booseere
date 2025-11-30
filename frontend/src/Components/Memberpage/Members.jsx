@@ -21,8 +21,33 @@ export default function Members() {
   const [membersData, setMembersData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [imageErrorStates, setImageErrorStates] = useState({});
 
   const perPage = 15;
+
+  // Create a reliable SVG placeholder
+  const createPlaceholderImage = (text = 'Member') => {
+    const svg = `
+      <svg width="150" height="150" xmlns="http://www.w3.org/2000/svg">
+        <rect width="150" height="150" fill="#4f9cf9"/>
+        <text x="75" y="75" font-family="Arial, sans-serif" font-size="12" fill="white" text-anchor="middle" dy=".3em">${text}</text>
+      </svg>
+    `;
+    return `data:image/svg+xml;base64,${btoa(svg)}`;
+  };
+
+  const defaultPlaceholder = createPlaceholderImage('Member');
+
+  // Handle image errors to prevent infinite loops
+  const handleImageError = (e, memberId) => {
+    const key = memberId || 'default';
+    if (!imageErrorStates[key]) {
+      console.warn(`Failed to load image for member ${key}, using placeholder`);
+      setImageErrorStates(prev => ({ ...prev, [key]: true }));
+      e.target.src = defaultPlaceholder;
+      e.target.onerror = null; // Prevent infinite loop
+    }
+  };
 
   // Load members from backend on component mount
   useEffect(() => {
@@ -182,11 +207,9 @@ export default function Members() {
               <div className="mem-card" key={m.membershipNumber || i}>
                 <div className="mem-media">
                   <img 
-                    src={m.profileImage || 'https://via.placeholder.com/150x150/4f9cf9/ffffff?text=Member'} 
+                    src={m.profileImage || defaultPlaceholder} 
                     alt={m.fullName} 
-                    onError={(e) => {
-                      e.target.src = 'https://via.placeholder.com/150x150/4f9cf9/ffffff?text=Member';
-                    }}
+                    onError={(e) => handleImageError(e, m.membershipNumber)}
                   />
                 </div>
                 <div className="mem-info">

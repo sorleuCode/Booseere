@@ -327,10 +327,12 @@ const getPublicMembers = asyncHandler(async (req, res) => {
   const publicMembers = members.map(member => ({
     fullName: member.fullName,
     position: member.position,
-    profileImage: member.profileImage || 'https://via.placeholder.com/150x150/4f9cf9/ffffff?text=Member',
+    profileImage: member.profileImage || '',
     membershipNumber: member.membershipNumber,
     status: member.status,
-    joinDate: member.joinDate
+    joinDate: member.joinDate,
+    phone: member.phone,
+    address: member.address
   }));
 
   res.json({

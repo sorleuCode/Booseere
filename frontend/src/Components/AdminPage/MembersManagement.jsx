@@ -34,6 +34,7 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
     photoPreview: null
   });
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [imageErrorStates, setImageErrorStates] = useState({});
 
   const [newLoan, setNewLoan] = useState({
     loanAmount: '',
@@ -109,6 +110,28 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
     return `₦${amount.toLocaleString()}`;
   };
 
+  // Create a reliable SVG placeholder
+  const createPlaceholderImage = (text = 'Member') => {
+    const svg = `
+      <svg width="150" height="150" xmlns="http://www.w3.org/2000/svg">
+        <rect width="150" height="150" fill="#4f9cf9"/>
+        <text x="75" y="75" font-family="Arial, sans-serif" font-size="12" fill="white" text-anchor="middle" dy=".3em">${text}</text>
+      </svg>
+    `;
+    return `data:image/svg+xml;base64,${btoa(svg)}`;
+  };
+
+  const defaultPlaceholder = createPlaceholderImage('Member');
+
+  // Handle image errors to prevent infinite loops
+  const handleImageError = (e, memberId) => {
+    const key = memberId || 'default';
+    if (!imageErrorStates[key]) {
+      setImageErrorStates(prev => ({ ...prev, [key]: true }));
+      e.target.src = defaultPlaceholder;
+    }
+  };
+
   // Handle Image Upload for New Member with Cloudinary
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
@@ -135,24 +158,44 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
           photo: uploadResult.secure_url,
           photoPreview: uploadResult.secure_url
         });
+        setUploadProgress(0);
       } catch (error) {
         alert('Failed to upload photo: ' + error.message);
       }
     }
   };
 
-  // Handle Image Upload for Edit Member
-  const handleEditImageUpload = (e) => {
+  // Handle Image Upload for Edit Member with Cloudinary
+  const handleEditImageUpload = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
+      // Validate file
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file');
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Image size should be less than 5MB');
+        return;
+      }
+
+      try {
+        setUploadProgress(0);
+        const uploadResult = await uploadToCloudinary(file, {
+          onProgress: (progress) => setUploadProgress(progress),
+          folder: 'booseere/members'
+        });
+
         setSelectedMember({
           ...selectedMember,
-          photo: reader.result
+          profileImage: uploadResult.secure_url,
+          photo: uploadResult.secure_url,
+          photoPreview: uploadResult.secure_url
         });
-      };
-      reader.readAsDataURL(file);
+        setUploadProgress(0);
+      } catch (error) {
+        alert('Failed to upload photo: ' + error.message);
+      }
     }
   };
 
@@ -193,7 +236,12 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
   const handleEditMemberSubmit = async (e) => {
     e.preventDefault();
     try {
-      await handleUpdateMember(selectedMember._id || selectedMember.id, selectedMember);
+      const updateData = {
+        ...selectedMember,
+        profileImage: selectedMember.profileImage || selectedMember.photo || null
+      };
+      
+      await handleUpdateMember(selectedMember._id || selectedMember.id, updateData);
       setShowEditModal(false);
     } catch (error) {
       console.error('Error updating member:', error);
@@ -333,12 +381,10 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
               {filteredMembers.map(member => (
                 <div key={member._id || member.id} className="member-card" onClick={() => setSelectedMember(member)}>
                   <img 
-                    src={member.profileImage || 'https://via.placeholder.com/150x150/4f9cf9/ffffff?text=Member'} 
+                    src={member.profileImage || defaultPlaceholder} 
                     alt={member.fullName} 
                     className="member-photo"
-                    onError={(e) => {
-                      e.target.src = 'https://via.placeholder.com/150x150/4f9cf9/ffffff?text=Member';
-                    }}
+                    onError={(e) => handleImageError(e, member._id || member.id)}
                   />
                   <h3>{member.fullName}</h3>
                   <div className="member-stats">
@@ -364,12 +410,10 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
           <div className="detail-container">
             <div className="detail-header">
               <img 
-                src={selectedMember.profileImage || 'https://via.placeholder.com/150x150/4f9cf9/ffffff?text=Member'} 
+                src={selectedMember.profileImage || defaultPlaceholder} 
                 alt={selectedMember.fullName} 
                 className="detail-photo"
-                onError={(e) => {
-                  e.target.src = 'https://via.placeholder.com/150x150/4f9cf9/ffffff?text=Member';
-                }}
+                onError={(e) => handleImageError(e, selectedMember._id || selectedMember.id)}
               />
               <div className="detail-title">
                 <h2>{selectedMember.fullName}</h2>
@@ -499,12 +543,10 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
               <div className="photo-upload-section">
                 <div className="photo-preview">
                   <img 
-                    src={selectedMember.profileImage || 'https://via.placeholder.com/150x150/4f9cf9/ffffff?text=Member'} 
+                    src={selectedMember.profileImage || selectedMember.photoPreview || defaultPlaceholder} 
                     alt={selectedMember.fullName} 
                     className="preview-image"
-                    onError={(e) => {
-                      e.target.src = 'https://via.placeholder.com/150x150/4f9cf9/ffffff?text=Member';
-                    }}
+                    onError={(e) => handleImageError(e, selectedMember._id || selectedMember.id)}
                   />
                 </div>
                 <div className="upload-controls">
@@ -518,6 +560,17 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
                       style={{ display: 'none' }}
                     />
                   </label>
+                  {uploadProgress > 0 && uploadProgress < 100 && (
+                    <div className="upload-progress">
+                      <div className="progress-bar">
+                        <div 
+                          className="progress-fill" 
+                          style={{ width: `${uploadProgress}%` }}
+                        ></div>
+                      </div>
+                      <span className="progress-text">{uploadProgress}%</span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -625,216 +678,31 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
       />
 
       <style jsx>{`
-        .filters-section {
-          background: white;
-          padding: 20px;
-          border-radius: 8px;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-          margin-bottom: 20px;
+        .upload-progress {
+          margin-top: 12px;
+          padding: 8px;
+          background: #f8fafc;
+          border-radius: 6px;
+          border: 1px solid #e2e8f0;
         }
-
-        .search-box {
-          margin-bottom: 15px;
-        }
-
-        .search-input {
+        .progress-bar {
           width: 100%;
-          padding: 12px 16px;
-          border: 1px solid #d1d5db;
-          border-radius: 6px;
-          font-size: 16px;
+          height: 6px;
+          background: #e2e8f0;
+          border-radius: 3px;
+          overflow: hidden;
+          margin-bottom: 4px;
         }
-
-        .search-input:focus {
-          outline: none;
-          border-color: #4f9cf9;
-          box-shadow: 0 0 0 3px rgba(79, 156, 249, 0.1);
+        .progress-fill {
+          height: 100%;
+          background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+          border-radius: 3px;
+          transition: width 0.3s ease;
         }
-
-        .filter-controls {
-          display: flex;
-          gap: 10px;
-          align-items: center;
-          flex-wrap: wrap;
-        }
-
-        .filter-select {
-          padding: 8px 12px;
-          border: 1px solid #d1d5db;
-          border-radius: 4px;
-          font-size: 14px;
-          min-width: 120px;
-        }
-
-        .sort-toggle {
-          padding: 8px 12px;
-          background: #f3f4f6;
-          border: 1px solid #d1d5db;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 14px;
-          font-weight: 600;
-        }
-
-        .sort-toggle:hover {
-          background: #e5e7eb;
-        }
-
-        /* Loan Management Section */
-        .loan-section {
-          margin-top: 30px;
-          padding: 20px;
-          background: white;
-          border-radius: 8px;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .loan-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 10px;
-        }
-
-        .loan-header h3 {
-          margin: 0;
-          color: #1f2937;
-          font-size: 18px;
-        }
-
-        .btn-create-loan {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: white;
-          border: none;
-          padding: 10px 16px;
-          border-radius: 6px;
-          font-size: 14px;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
-        }
-
-        .btn-create-loan:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
-        }
-
-        .loan-info {
-          color: #6b7280;
-          font-size: 14px;
-          margin: 0;
-        }
-
-        /* Responsive loan section */
-        @media (max-width: 768px) {
-          .loan-section {
-            margin-top: 20px;
-            padding: 16px;
-          }
-
-          .loan-header {
-            flex-direction: column;
-            gap: 12px;
-            align-items: stretch;
-          }
-
-          .loan-header h3 {
-            font-size: 16px;
-          }
-
-          .btn-create-loan {
-            width: 100%;
-            text-align: center;
-            padding: 12px 16px;
-            font-size: 16px;
-          }
-        }
-
-        @media (max-width: 480px) {
-          .loan-section {
-            margin-top: 16px;
-            padding: 12px;
-          }
-
-          .loan-header h3 {
-            font-size: 14px;
-          }
-
-          .btn-create-loan {
-            padding: 10px 14px;
-            font-size: 14px;
-          }
-
-          .loan-info {
-            font-size: 12px;
-          }
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-          .members-content {
-            padding: 16px;
-          }
-
-          .members-header {
-            flex-direction: column;
-            gap: 16px;
-            align-items: stretch;
-          }
-
-          .filters-section {
-            padding: 16px;
-          }
-
-          .filter-controls {
-            flex-direction: column;
-            align-items: stretch;
-          }
-
-          .filter-select {
-            min-width: auto;
-            width: 100%;
-          }
-
-          .members-grid {
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 16px;
-          }
-
-          .member-card {
-            padding: 16px;
-          }
-
-          .modal-content {
-            margin: 16px;
-            padding: 20px;
-            width: calc(100% - 32px);
-            max-width: none;
-          }
-        }
-
-        @media (max-width: 480px) {
-          .members-content {
-            padding: 12px;
-          }
-
-          .filters-section {
-            padding: 12px;
-          }
-
-          .members-grid {
-            grid-template-columns: 1fr;
-          }
-
-          .member-card {
-            padding: 12px;
-          }
-
-          .btn-back, .btn-add-member {
-            padding: 6px 10px;
-            font-size: 12px;
-          }
+        .progress-text {
+          font-size: 0.75em;
+          color: #64748b;
+          font-weight: 500;
         }
       `}</style>
     </>
