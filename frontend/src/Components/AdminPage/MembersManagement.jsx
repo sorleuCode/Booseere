@@ -676,35 +676,6 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
         onConfirm={confirmState.onConfirm}
         onCancel={confirmState.onCancel}
       />
-
-      <style jsx>{`
-        .upload-progress {
-          margin-top: 12px;
-          padding: 8px;
-          background: #f8fafc;
-          border-radius: 6px;
-          border: 1px solid #e2e8f0;
-        }
-        .progress-bar {
-          width: 100%;
-          height: 6px;
-          background: #e2e8f0;
-          border-radius: 3px;
-          overflow: hidden;
-          margin-bottom: 4px;
-        }
-        .progress-fill {
-          height: 100%;
-          background: linear-gradient(90deg, #3b82f6, #1d4ed8);
-          border-radius: 3px;
-          transition: width 0.3s ease;
-        }
-        .progress-text {
-          font-size: 0.75em;
-          color: #64748b;
-          font-weight: 500;
-        }
-      `}</style>
     </>
   );
 }

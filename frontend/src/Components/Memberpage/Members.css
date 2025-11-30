@@ -1,4 +1,4 @@
-/* Members.css - Premium Cooperative Design */
+a/* Members.css - Premium Cooperative Design */
 
 .mem-preview {
   position: relative;
@@ -64,6 +64,7 @@
   gap: 1.5rem;
   flex-wrap: wrap;
   animation: fadeInUp 0.8s ease 0.2s both;
+  position: relative;
 }
 
 @keyframes fadeInUp {
@@ -80,7 +81,7 @@
 .mem-search {
   flex: 1;
   min-width: 300px;
-  padding: 1.2rem 1.8rem;
+  padding: 1.2rem 3rem 1.2rem 1.8rem;
   font-size: 1rem;
   color: #1e293b;
   background: #ffffff;
@@ -89,10 +90,13 @@
   outline: none;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+  position: relative;
+  font-weight: 500;
 }
 
 .mem-search::placeholder {
   color: #94a3b8;
+  font-weight: 400;
 }
 
 .mem-search:focus {
@@ -100,10 +104,60 @@
   box-shadow: 0 4px 20px rgba(99, 102, 241, 0.15),
               0 0 0 4px rgba(99, 102, 241, 0.1);
   transform: translateY(-2px);
+  background: #ffffff;
+}
+
+.mem-search:focus::placeholder {
+  color: #cbd5e1;
+}
+
+.mem-search:not(:placeholder-shown) {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+}
+
+.mem-search-wrapper {
+  position: relative;
+  flex: 1;
+  min-width: 300px;
+}
+
+.mem-search-wrapper::before {
+  content: '🔍';
+  position: absolute;
+  right: 1.2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.1rem;
+  z-index: 2;
+  color: #94a3b8;
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+.mem-search-wrapper:focus-within::before {
+  color: #6366f1;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.mem-search-wrapper::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  padding: 2px;
+  background: linear-gradient(135deg, transparent, rgba(99, 102, 241, 0.3), transparent);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.mem-search-wrapper:focus-within::after {
+  opacity: 1;
 }
 
 .mem-filter {
-  padding: 1.2rem 1.8rem;
+  padding: 1.2rem 3rem 1.2rem 1.8rem;
   font-size: 1rem;
   font-weight: 600;
   color: #1e293b;
@@ -115,18 +169,63 @@
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
   min-width: 180px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6,9 12,15 18,9'></polyline></svg>");
+  background-repeat: no-repeat;
+  background-position: right 1.2rem center;
+  background-size: 16px;
+  position: relative;
+  font-weight: 600;
 }
 
 .mem-filter:hover {
   border-color: #a855f7;
   box-shadow: 0 4px 20px rgba(168, 85, 247, 0.15);
   transform: translateY(-2px);
+  background-image: url("data:image/svg+xml;charset=US-ASCII,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a855f7' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6,9 12,15 18,9'></polyline></svg>");
 }
 
 .mem-filter:focus {
   border-color: #6366f1;
   box-shadow: 0 4px 20px rgba(99, 102, 241, 0.15),
               0 0 0 4px rgba(99, 102, 241, 0.1);
+  background-image: url("data:image/svg+xml;charset=US-ASCII,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6,9 12,15 18,9'></polyline></svg>");
+}
+
+.mem-filter option {
+  padding: 1rem;
+  background: #ffffff;
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.mem-filter-wrapper {
+  position: relative;
+  min-width: 180px;
+}
+
+.mem-filter-wrapper::before {
+  content: '👥';
+  position: absolute;
+  left: 1.2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.1rem;
+  z-index: 1;
+  color: #94a3b8;
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+.mem-filter-wrapper:focus-within::before {
+  color: #6366f1;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.mem-filter {
+  padding-left: 3rem;
 }
 
 .mem-grid {
@@ -372,7 +471,14 @@
 
   .mem-controls {
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.5rem;
+    align-items: stretch;
+  }
+
+  .mem-search-wrapper,
+  .mem-filter-wrapper {
+    width: 100%;
+    min-width: auto;
   }
 
   .mem-search,
@@ -442,6 +548,101 @@
   }
 }
 
+/* Placeholder image styling */
+.mem-media img[src^="data:image/svg"] {
+  background: linear-gradient(135deg, #4f9cf9, #6366f1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+  text-align: center;
+}
+
+/* Ensure proper aspect ratio for all images */
+.mem-media img {
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+
+/* Better error state styling */
+.mem-media img:not([src^="data:image/svg"]):not([src*="cloudinary"]):not([src*="placeholder"]) {
+  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Enhanced image loading states */
+.mem-media {
+  position: relative;
+  overflow: hidden;
+}
+
+.mem-media::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.mem-media img[src^="data:image/svg"] + ::before {
+  opacity: 0;
+}
+
+/* Ensure images maintain aspect ratio */
+.mem-media img {
+  position: relative;
+  z-index: 2;
+}
+
+/* Loading skeleton effect */
+.mem-media img:not([src]) {
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Improve responsive image handling */
+@media (max-width: 768px) {
+  .mem-media {
+    height: 250px;
+  }
+  
+  .mem-media img {
+    height: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  .mem-media {
+    height: 220px;
+  }
+  
+  .mem-media img {
+    height: 220px;
+  }
+}
+
 /* Stagger animation for cards */
 .mem-card:nth-child(1) { animation-delay: 0.1s; }
 .mem-card:nth-child(2) { animation-delay: 0.15s; }
@@ -467,48 +668,236 @@
 .mem-card {
   animation: cardSlideIn 0.6s ease backwards;
 }
-/* Loading and Error States */
+/* Enhanced Loading and Error States */
 .loading-overlay {
   text-align: center;
   padding: 20px;
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
   margin: 20px 0;
   font-style: italic;
-  color: #666;
+  color: #6366f1;
+  border: 2px solid rgba(99, 102, 241, 0.2);
+  backdrop-filter: blur(10px);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
 }
 
 .error-message {
   color: #d32f2f;
-  background: #ffebee;
-  padding: 15px;
-  border-radius: 8px;
-  border-left: 4px solid #d32f2f;
+  background: linear-gradient(135deg, #ffebee, #ffcdd2);
+  padding: 20px;
+  border-radius: 16px;
+  border-left: 6px solid #d32f2f;
+  font-weight: 500;
+  box-shadow: 0 4px 15px rgba(211, 47, 47, 0.1);
 }
 
 .retry-button, .clear-filters {
-  background: #1976d2;
+  background: linear-gradient(135deg, #1976d2, #1e88e5);
   color: white;
   border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
+  padding: 12px 24px;
+  border-radius: 12px;
   cursor: pointer;
-  margin-top: 10px;
+  margin-top: 15px;
   font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(25, 118, 210, 0.3);
 }
 
 .retry-button:hover, .clear-filters:hover {
-  background: #1565c0;
+  background: linear-gradient(135deg, #1565c0, #1976d2);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(25, 118, 210, 0.4);
 }
 
 .no-members {
   text-align: center;
-  padding: 40px;
-  color: #666;
+  padding: 60px 40px;
+  color: #64748b;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  border-radius: 20px;
+  border: 2px solid #e2e8f0;
+}
+
+.no-members p {
+  font-size: 1.1rem;
+  margin-bottom: 20px;
+  font-weight: 500;
 }
 
 .member-count {
   font-size: 14px;
-  color: #666;
-  margin-top: 10px;
+  color: #6366f1;
+  margin-top: 15px;
+  font-weight: 600;
+  background: rgba(99, 102, 241, 0.1);
+  padding: 8px 16px;
+  border-radius: 20px;
+  display: inline-block;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  animation: fadeInUp 0.6s ease;
+}
+
+/* Add a subtle glow effect to active controls */
+.mem-search:focus,
+.mem-filter:focus {
+  position: relative;
+}
+
+.mem-search:focus::after,
+.mem-filter:focus::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(168, 85, 247, 0.3));
+  z-index: -1;
+  filter: blur(8px);
+  opacity: 0.7;
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from { opacity: 0.5; }
+  to { opacity: 0.8; }
+}
+
+/* Enhanced placeholder animation */
+.mem-search::placeholder {
+  transition: all 0.3s ease;
+}
+
+.mem-search:focus::placeholder {
+  transform: translateX(10px);
+  opacity: 0.7;
+}
+
+/* Better focus indicators for accessibility */
+.mem-search:focus-visible,
+.mem-filter:focus-visible {
+  outline: 3px solid rgba(99, 102, 241, 0.5);
+  outline-offset: 2px;
+}
+
+/* Add a subtle shake animation for invalid inputs (optional) */
+.mem-search:invalid {
+  border-color: #ef4444;
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+/* Enhanced control labels and hints */
+.mem-controls::before {
+  content: 'Find and filter members';
+  display: block;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #64748b;
+  margin-bottom: 1rem;
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+/* Add subtle background patterns to controls */
+.mem-search-wrapper,
+.mem-filter-wrapper {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(248, 250, 252, 0.1));
+  border-radius: 18px;
+  padding: 2px;
+  position: relative;
+}
+
+.mem-search-wrapper::before,
+.mem-filter-wrapper::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, transparent, rgba(99, 102, 241, 0.05), transparent);
+  border-radius: 18px;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.mem-search-wrapper:hover::before,
+.mem-filter-wrapper:hover::before {
+  opacity: 1;
+}
+
+/* Better visual hierarchy */
+.mem-controls {
+  padding: 2rem;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(248, 250, 252, 0.6));
+  border-radius: 24px;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.05),
+    0 1px 3px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+  margin-bottom: 3rem;
+}
+
+/* Responsive adjustments for enhanced controls */
+@media (max-width: 768px) {
+  .mem-controls {
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  .mem-controls::before {
+    margin-bottom: 1.5rem;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .mem-controls {
+    padding: 1rem;
+    border-radius: 20px;
+  }
+}
+
+/* Enhanced search and filter states */
+.mem-search:focus,
+.mem-filter:focus {
+  animation: focusPulse 0.6s ease;
+}
+
+@keyframes focusPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+
+/* Active state styling */
+.mem-search:not(:placeholder-shown),
+.mem-filter:not([value=""]) {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-color: #6366f1;
+}
+
+/* Loading states for controls */
+.mem-controls.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.mem-controls.loading .mem-search,
+.mem-controls.loading .mem-filter {
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
 }

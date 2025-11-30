@@ -28,9 +28,16 @@ export default function Members() {
   // Create a reliable SVG placeholder
   const createPlaceholderImage = (text = 'Member') => {
     const svg = `
-      <svg width="150" height="150" xmlns="http://www.w3.org/2000/svg">
-        <rect width="150" height="150" fill="#4f9cf9"/>
-        <text x="75" y="75" font-family="Arial, sans-serif" font-size="12" fill="white" text-anchor="middle" dy=".3em">${text}</text>
+      <svg width="300" height="300" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#4f9cf9;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#6366f1;stop-opacity:1" />
+          </linearGradient>
+        </defs>
+        <rect width="300" height="300" fill="url(#grad)"/>
+        <circle cx="150" cy="120" r="40" fill="rgba(255,255,255,0.2)"/>
+        <text x="150" y="220" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="white" text-anchor="middle" dy=".3em">${text}</text>
       </svg>
     `;
     return `data:image/svg+xml;base64,${btoa(svg)}`;
@@ -166,19 +173,23 @@ export default function Members() {
       </div>
 
       <div className="mem-controls">
-        <input
-          type="search"
-          placeholder="Search members by name, number or position..."
-          value={search}
-          onChange={handleSearch}
-          className="mem-search"
-        />
+        <div className="mem-search-wrapper">
+          <input
+            type="search"
+            placeholder="Search members by name, number or position..."
+            value={search}
+            onChange={handleSearch}
+            className="mem-search"
+          />
+        </div>
 
-        <select value={filter} onChange={handleFilter} className="mem-filter">
-          <option value="All">All</option>
-          <option value="Exco">Exco</option>
-          <option value="Member">Member</option>
-        </select>
+        <div className="mem-filter-wrapper">
+          <select value={filter} onChange={handleFilter} className="mem-filter">
+            <option value="All">All</option>
+            <option value="Exco">Exco</option>
+            <option value="Member">Member</option>
+          </select>
+        </div>
       </div>
 
       {loading && membersData.length > 0 && (
@@ -210,6 +221,12 @@ export default function Members() {
                     src={m.profileImage || defaultPlaceholder} 
                     alt={m.fullName} 
                     onError={(e) => handleImageError(e, m.membershipNumber)}
+                    loading="lazy"
+                    style={{ 
+                      objectFit: 'cover',
+                      width: '100%',
+                      height: '100%'
+                    }}
                   />
                 </div>
                 <div className="mem-info">
