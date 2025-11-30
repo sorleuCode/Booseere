@@ -182,15 +182,15 @@ export default function Members() {
               <div className="mem-card" key={m.membershipNumber || i}>
                 <div className="mem-media">
                   <img 
-                    src={m.image} 
-                    alt={m.name} 
+                    src={m.profileImage || 'https://via.placeholder.com/150x150/4f9cf9/ffffff?text=Member'} 
+                    alt={m.fullName} 
                     onError={(e) => {
-                      e.target.src = '/placeholder-member.jpg';
+                      e.target.src = 'https://via.placeholder.com/150x150/4f9cf9/ffffff?text=Member';
                     }}
                   />
                 </div>
                 <div className="mem-info">
-                  <h4>{m.name}</h4>
+                  <h4>{m.fullName}</h4>
                   <p>{m.position}</p>
                   <p className="mem-address">{m.address}</p>
                   <a href={waUrl} target="_blank" rel="noreferrer">

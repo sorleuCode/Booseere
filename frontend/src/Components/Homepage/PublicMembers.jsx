@@ -80,7 +80,7 @@ const PublicMembers = () => {
       </div>
 
       {loading ? (
-        <LoadingSpinner size="large" text="Loading members..." />
+        <LoadingSpinner size="large" />
       ) : error ? (
         <div className="error-state">
           <p>❌ {error}</p>

@@ -318,7 +318,7 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
           </div>
 
           {loading ? (
-            <LoadingSpinner size="large" text="Loading members..." />
+            <LoadingSpinner size="large" />
           ) : error ? (
             <div className="error-state">
               <p>⚠️ {error}</p>
@@ -332,7 +332,14 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
             <div className="members-grid">
               {filteredMembers.map(member => (
                 <div key={member._id || member.id} className="member-card" onClick={() => setSelectedMember(member)}>
-                  <img src={member.profileImage || '/api/placeholder/150/150'} alt={member.fullName} className="member-photo" />
+                  <img 
+                    src={member.profileImage || 'https://via.placeholder.com/150x150/4f9cf9/ffffff?text=Member'} 
+                    alt={member.fullName} 
+                    className="member-photo"
+                    onError={(e) => {
+                      e.target.src = 'https://via.placeholder.com/150x150/4f9cf9/ffffff?text=Member';
+                    }}
+                  />
                   <h3>{member.fullName}</h3>
                   <div className="member-stats">
                     <div>
@@ -356,7 +363,14 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
 
           <div className="detail-container">
             <div className="detail-header">
-              <img src={selectedMember.profileImage || '/api/placeholder/150/150'} alt={selectedMember.fullName} className="detail-photo" />
+              <img 
+                src={selectedMember.profileImage || 'https://via.placeholder.com/150x150/4f9cf9/ffffff?text=Member'} 
+                alt={selectedMember.fullName} 
+                className="detail-photo"
+                onError={(e) => {
+                  e.target.src = 'https://via.placeholder.com/150x150/4f9cf9/ffffff?text=Member';
+                }}
+              />
               <div className="detail-title">
                 <h2>{selectedMember.fullName}</h2>
                 <span className={`status-pill ${selectedMember.status.toLowerCase()}`}>{selectedMember.status}</span>
@@ -484,7 +498,14 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
               {/* Photo Upload Section */}
               <div className="photo-upload-section">
                 <div className="photo-preview">
-                  <img src={selectedMember.profileImage || '/api/placeholder/150/150'} alt={selectedMember.fullName} className="preview-image" />
+                  <img 
+                    src={selectedMember.profileImage || 'https://via.placeholder.com/150x150/4f9cf9/ffffff?text=Member'} 
+                    alt={selectedMember.fullName} 
+                    className="preview-image"
+                    onError={(e) => {
+                      e.target.src = 'https://via.placeholder.com/150x150/4f9cf9/ffffff?text=Member';
+                    }}
+                  />
                 </div>
                 <div className="upload-controls">
                   <label htmlFor="edit-member-photo" className="btn-upload">
