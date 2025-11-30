@@ -6,6 +6,7 @@ import { useMembers } from '../../context/MembersContext';
 import DashboardOverview from './DashboardOverview';
 import MembersManagement from './MembersManagement';
 import MessagesManagement from './MessagesManagement';
+import AdminNotesSidebar from './AdminNotesSidebar';
 import './Admindash.css';
 
 function FullAdminDashboard() {
@@ -14,6 +15,7 @@ function FullAdminDashboard() {
   const { members } = useMembers();
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedMember, setSelectedMember] = useState(null);
+  const [notesExpanded, setNotesExpanded] = useState(false);
 
   // Save members to localStorage for homepage
   useEffect(() => {
@@ -66,6 +68,11 @@ function FullAdminDashboard() {
     <span className="item-icon">📬</span>
     <span>Messages</span>
   </button>
+
+  <AdminNotesSidebar
+    isExpanded={notesExpanded}
+    onToggle={() => setNotesExpanded(!notesExpanded)}
+  />
 
   <button className="menu-item logout" onClick={handleLogout}>
     <span className="item-icon">🚪</span>

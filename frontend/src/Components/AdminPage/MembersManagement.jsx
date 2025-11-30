@@ -27,7 +27,6 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
 
   const [newMember, setNewMember] = useState({
     fullName: '',
-    email: '',
     phone: '',
     address: '',
     totalContributions: 0,
@@ -50,7 +49,6 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
     if (searchTerm) {
       filtered = filtered.filter(member =>
         member.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        member.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         member.phone?.includes(searchTerm) ||
         member.membershipNumber?.toLowerCase().includes(searchTerm.toLowerCase())
       );
@@ -78,10 +76,6 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
         case 'fullName':
           aValue = a.fullName || '';
           bValue = b.fullName || '';
-          break;
-        case 'email':
-          aValue = a.email || '';
-          bValue = b.email || '';
           break;
         case 'totalContributions':
           aValue = a.totalContributions || 0;
@@ -169,7 +163,6 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
     try {
       const memberData = {
         fullName: newMember.fullName,
-        email: newMember.email,
         phone: newMember.phone,
         address: newMember.address,
         totalContributions: newMember.totalContributions || 0,
@@ -181,7 +174,6 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
       setShowAddModal(false);
       setNewMember({
         fullName: '',
-        email: '',
         phone: '',
         address: '',
         totalContributions: 0,
@@ -273,7 +265,7 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
             <div className="search-box">
               <input
                 type="text"
-                placeholder="Search by name, email, phone, membership number..."
+                placeholder="Search by name, phone, membership number..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="search-input"
@@ -313,7 +305,6 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
               >
                 <option value="joinDate">Sort by Join Date</option>
                 <option value="fullName">Sort by Name</option>
-                <option value="email">Sort by Email</option>
                 <option value="totalContributions">Sort by Contributions</option>
               </select>
 
@@ -343,7 +334,6 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
                 <div key={member._id || member.id} className="member-card" onClick={() => setSelectedMember(member)}>
                   <img src={member.profileImage || '/api/placeholder/150/150'} alt={member.fullName} className="member-photo" />
                   <h3>{member.fullName}</h3>
-                  <p className="member-email">{member.email}</p>
                   <div className="member-stats">
                     <div>
                       <span className="mini-label">Saved</span>
@@ -369,7 +359,6 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
               <img src={selectedMember.profileImage || '/api/placeholder/150/150'} alt={selectedMember.fullName} className="detail-photo" />
               <div className="detail-title">
                 <h2>{selectedMember.fullName}</h2>
-                <p>{selectedMember.email}</p>
                 <span className={`status-pill ${selectedMember.status.toLowerCase()}`}>{selectedMember.status}</span>
               </div>
               <div className="detail-actions">
@@ -458,7 +447,6 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
               </div>
 
               <input type="text" placeholder="Full Name *" value={newMember.fullName || ''} onChange={(e) => setNewMember({...newMember, fullName: e.target.value})} required />
-              <input type="email" placeholder="Email *" value={newMember.email} onChange={(e) => setNewMember({...newMember, email: e.target.value})} required />
               <input type="tel" placeholder="Phone *" value={newMember.phone} onChange={(e) => setNewMember({...newMember, phone: e.target.value})} required />
               <input type="text" placeholder="Address *" value={newMember.address} onChange={(e) => setNewMember({...newMember, address: e.target.value})} required />
               <input
@@ -513,7 +501,6 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
               </div>
 
               <input type="text" value={selectedMember.fullName} onChange={(e) => setSelectedMember({...selectedMember, fullName: e.target.value})} required />
-              <input type="email" value={selectedMember.email} onChange={(e) => setSelectedMember({...selectedMember, email: e.target.value})} required />
               <input type="tel" value={selectedMember.phone} onChange={(e) => setSelectedMember({...selectedMember, phone: e.target.value})} required />
               <input type="text" value={selectedMember.address} onChange={(e) => setSelectedMember({...selectedMember, address: e.target.value})} required />
               <input

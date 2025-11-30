@@ -2,7 +2,6 @@ import asyncHandler from 'express-async-handler';
 import Member from '../models/Member.js';
 import Contribution from '../models/Contribution.js';
 import Loan from '../models/Loan.js';
-import { sendWelcomeEmail } from '../services/emailService.js';
 
 // @desc    Get all members (Admin only)
 // @route   GET /api/members
@@ -23,7 +22,6 @@ const getMembers = asyncHandler(async (req, res) => {
   if (search) {
     query.$or = [
       { fullName: { $regex: search, $options: 'i' } },
-      { email: { $regex: search, $options: 'i' } },
       { phone: { $regex: search, $options: 'i' } },
       { membershipNumber: { $regex: search, $options: 'i' } },
     ];
@@ -75,7 +73,6 @@ const getMember = asyncHandler(async (req, res) => {
 const createMember = asyncHandler(async (req, res) => {
   const {
     fullName,
-    email,
     phone,
     address,
     position,
@@ -83,13 +80,13 @@ const createMember = asyncHandler(async (req, res) => {
   } = req.body;
 
   // Check if member already exists
-  const existingMember = await Member.findOne({ 
-    $or: [{ email }, { phone }] 
+  const existingMember = await Member.findOne({
+    phone
   });
 
   if (existingMember) {
     res.status(400);
-    throw new Error('Member with this email or phone already exists');
+    throw new Error('Member with this phone already exists');
   }
 
   // Generate membership number
@@ -99,7 +96,6 @@ const createMember = asyncHandler(async (req, res) => {
   // Create member (profileImage comes from frontend Cloudinary upload)
   const member = await Member.create({
     fullName,
-    email,
     phone,
     address,
     position: position || 'Member',
@@ -108,22 +104,6 @@ const createMember = asyncHandler(async (req, res) => {
     status: 'active',
     joinDate: new Date(),
   });
-
-  // Send welcome email asynchronously (don't block member creation)
-  if (process.env.ENABLE_EMAILS !== 'false') {
-    setImmediate(async () => {
-      try {
-        console.log(`Sending welcome email to ${email} (${fullName}) with membership ${membershipNumber}...`);
-        const emailResult = await sendWelcomeEmail(email, fullName, membershipNumber);
-        console.log('Welcome email sent successfully:', emailResult);
-      } catch (emailError) {
-        console.error('Failed to send welcome email (async):', emailError);
-        // Email failure doesn't affect member creation
-      }
-    });
-  } else {
-    console.log('Email sending disabled via ENABLE_EMAILS=false');
-  }
 
   res.status(201).json({
     success: true,
