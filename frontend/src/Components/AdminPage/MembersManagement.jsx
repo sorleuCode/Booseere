@@ -34,6 +34,7 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
     photoPreview: null
   });
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [imageErrorStates, setImageErrorStates] = useState({});
 
   const [newLoan, setNewLoan] = useState({
     loanAmount: '',
@@ -107,6 +108,28 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
 
   const formatCurrency = (amount) => {
     return `₦${amount.toLocaleString()}`;
+  };
+
+  // Create a reliable SVG placeholder
+  const createPlaceholderImage = (text = 'Member') => {
+    const svg = `
+      <svg width="150" height="150" xmlns="http://www.w3.org/2000/svg">
+        <rect width="150" height="150" fill="#4f9cf9"/>
+        <text x="75" y="75" font-family="Arial, sans-serif" font-size="12" fill="white" text-anchor="middle" dy=".3em">${text}</text>
+      </svg>
+    `;
+    return `data:image/svg+xml;base64,${btoa(svg)}`;
+  };
+
+  const defaultPlaceholder = createPlaceholderImage('Member');
+
+  // Handle image errors to prevent infinite loops
+  const handleImageError = (e, memberId) => {
+    const key = memberId || 'default';
+    if (!imageErrorStates[key]) {
+      setImageErrorStates(prev => ({ ...prev, [key]: true }));
+      e.target.src = defaultPlaceholder;
+    }
   };
 
   // Handle Image Upload for New Member with Cloudinary
@@ -333,12 +356,10 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
               {filteredMembers.map(member => (
                 <div key={member._id || member.id} className="member-card" onClick={() => setSelectedMember(member)}>
                   <img 
-                    src={member.profileImage || 'https://via.placeholder.com/150x150/4f9cf9/ffffff?text=Member'} 
+                    src={member.profileImage || defaultPlaceholder} 
                     alt={member.fullName} 
                     className="member-photo"
-                    onError={(e) => {
-                      e.target.src = 'https://via.placeholder.com/150x150/4f9cf9/ffffff?text=Member';
-                    }}
+                    onError={(e) => handleImageError(e, member._id || member.id)}
                   />
                   <h3>{member.fullName}</h3>
                   <div className="member-stats">
@@ -364,12 +385,10 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
           <div className="detail-container">
             <div className="detail-header">
               <img 
-                src={selectedMember.profileImage || 'https://via.placeholder.com/150x150/4f9cf9/ffffff?text=Member'} 
+                src={selectedMember.profileImage || defaultPlaceholder} 
                 alt={selectedMember.fullName} 
                 className="detail-photo"
-                onError={(e) => {
-                  e.target.src = 'https://via.placeholder.com/150x150/4f9cf9/ffffff?text=Member';
-                }}
+                onError={(e) => handleImageError(e, selectedMember._id || selectedMember.id)}
               />
               <div className="detail-title">
                 <h2>{selectedMember.fullName}</h2>
@@ -499,12 +518,10 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
               <div className="photo-upload-section">
                 <div className="photo-preview">
                   <img 
-                    src={selectedMember.profileImage || 'https://via.placeholder.com/150x150/4f9cf9/ffffff?text=Member'} 
+                    src={selectedMember.profileImage || defaultPlaceholder} 
                     alt={selectedMember.fullName} 
                     className="preview-image"
-                    onError={(e) => {
-                      e.target.src = 'https://via.placeholder.com/150x150/4f9cf9/ffffff?text=Member';
-                    }}
+                    onError={(e) => handleImageError(e, selectedMember._id || selectedMember.id)}
                   />
                 </div>
                 <div className="upload-controls">
@@ -624,219 +641,7 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
         onCancel={confirmState.onCancel}
       />
 
-      <style jsx>{`
-        .filters-section {
-          background: white;
-          padding: 20px;
-          border-radius: 8px;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-          margin-bottom: 20px;
-        }
 
-        .search-box {
-          margin-bottom: 15px;
-        }
-
-        .search-input {
-          width: 100%;
-          padding: 12px 16px;
-          border: 1px solid #d1d5db;
-          border-radius: 6px;
-          font-size: 16px;
-        }
-
-        .search-input:focus {
-          outline: none;
-          border-color: #4f9cf9;
-          box-shadow: 0 0 0 3px rgba(79, 156, 249, 0.1);
-        }
-
-        .filter-controls {
-          display: flex;
-          gap: 10px;
-          align-items: center;
-          flex-wrap: wrap;
-        }
-
-        .filter-select {
-          padding: 8px 12px;
-          border: 1px solid #d1d5db;
-          border-radius: 4px;
-          font-size: 14px;
-          min-width: 120px;
-        }
-
-        .sort-toggle {
-          padding: 8px 12px;
-          background: #f3f4f6;
-          border: 1px solid #d1d5db;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 14px;
-          font-weight: 600;
-        }
-
-        .sort-toggle:hover {
-          background: #e5e7eb;
-        }
-
-        /* Loan Management Section */
-        .loan-section {
-          margin-top: 30px;
-          padding: 20px;
-          background: white;
-          border-radius: 8px;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .loan-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 10px;
-        }
-
-        .loan-header h3 {
-          margin: 0;
-          color: #1f2937;
-          font-size: 18px;
-        }
-
-        .btn-create-loan {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: white;
-          border: none;
-          padding: 10px 16px;
-          border-radius: 6px;
-          font-size: 14px;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
-        }
-
-        .btn-create-loan:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
-        }
-
-        .loan-info {
-          color: #6b7280;
-          font-size: 14px;
-          margin: 0;
-        }
-
-        /* Responsive loan section */
-        @media (max-width: 768px) {
-          .loan-section {
-            margin-top: 20px;
-            padding: 16px;
-          }
-
-          .loan-header {
-            flex-direction: column;
-            gap: 12px;
-            align-items: stretch;
-          }
-
-          .loan-header h3 {
-            font-size: 16px;
-          }
-
-          .btn-create-loan {
-            width: 100%;
-            text-align: center;
-            padding: 12px 16px;
-            font-size: 16px;
-          }
-        }
-
-        @media (max-width: 480px) {
-          .loan-section {
-            margin-top: 16px;
-            padding: 12px;
-          }
-
-          .loan-header h3 {
-            font-size: 14px;
-          }
-
-          .btn-create-loan {
-            padding: 10px 14px;
-            font-size: 14px;
-          }
-
-          .loan-info {
-            font-size: 12px;
-          }
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-          .members-content {
-            padding: 16px;
-          }
-
-          .members-header {
-            flex-direction: column;
-            gap: 16px;
-            align-items: stretch;
-          }
-
-          .filters-section {
-            padding: 16px;
-          }
-
-          .filter-controls {
-            flex-direction: column;
-            align-items: stretch;
-          }
-
-          .filter-select {
-            min-width: auto;
-            width: 100%;
-          }
-
-          .members-grid {
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 16px;
-          }
-
-          .member-card {
-            padding: 16px;
-          }
-
-          .modal-content {
-            margin: 16px;
-            padding: 20px;
-            width: calc(100% - 32px);
-            max-width: none;
-          }
-        }
-
-        @media (max-width: 480px) {
-          .members-content {
-            padding: 12px;
-          }
-
-          .filters-section {
-            padding: 12px;
-          }
-
-          .members-grid {
-            grid-template-columns: 1fr;
-          }
-
-          .member-card {
-            padding: 12px;
-          }
-
-          .btn-back, .btn-add-member {
-            padding: 6px 10px;
-            font-size: 12px;
-          }
-        }
-      `}</style>
     </>
   );
 }
