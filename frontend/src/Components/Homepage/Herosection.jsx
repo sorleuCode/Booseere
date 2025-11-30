@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import './Herosection.css';
 
+
 function HeroSection() {
   const [currentWord, setCurrentWord] = useState(0);
   const words = [];
