@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { getPublicMembers } from "../../api/members";
 import "./Members.css";
+import Footer from "../Homepage/Footer";
 
 const filterTypes = ["Exco", "Member"];
 
@@ -93,7 +94,6 @@ export default function Members() {
 
   const handlePage = (page) => {
     setCurrentPage(page);
-    // Scroll back to the top of section
     if (topRef.current) {
       window.scrollTo({
         top: topRef.current.offsetTop - 20,
@@ -130,6 +130,7 @@ export default function Members() {
   }
 
   return (
+    <>
     <section className="mem-preview" ref={topRef}>
       <div className="mem-intro">
         <h2 className="mem-title">Members Page</h2>
@@ -228,5 +229,7 @@ export default function Members() {
         </div>
       )}
     </section>
+    <Footer/> 
+    </>
   );
 }

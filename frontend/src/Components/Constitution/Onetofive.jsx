@@ -188,9 +188,12 @@ export default function BooseereConstitution() {
           </div>
         </div>
         
-        <div className="but">
-            <button>OUR Laws</button>
-        </div>
+      <div className="but">
+  <a href="/laws">
+    <button>OUR Laws</button>
+  </a>
+</div>
+
       </div>
     </div>
   );

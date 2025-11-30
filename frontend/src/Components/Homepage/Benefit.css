@@ -263,8 +263,16 @@
 
 @media (max-width: 480px) {
   .benefits-title {
-    font-size: 28px;
+    font-size: 22px;
   }
+
+  .benefits-section{
+    position:relative;
+    bottom:11rem;
+     padding: 10px 0;
+
+  }
+
 
   .benefit-title {
     font-size: 20px;
@@ -275,7 +283,8 @@
   }
 
   .price {
-    font-size: 36px;
+    font-size: 20px;
+    /* background: red; */
   }
 
   .feature-item {

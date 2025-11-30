@@ -8,15 +8,17 @@ function HowItWorksSection() {
     {
       number: '01',
       title: 'Join Our Community',
-      description: 'Complete a simple registration process and become a member of our cooperative family. No complex paperwork required.',
+      description:'Pay a registration fee of #5,000, and become a member of our cooperative family. No complex paperwork required.',
       color: '#667eea'
     },
-    {
-      number: '02',
-      title: 'Make Regular Contributions',
-      description: 'Choose a contribution plan that works for you—starting from just $20 per month. Contributions are flexible and affordable.',
-      color: '#764ba2'
-    },
+  {
+  number: '02',
+  title: 'Make Regular Contributions',
+  description:
+    'Stay committed by making your agreed  contributions. Your consistency strengthens the cooperative and unlocks your personal benefits.',
+  color: '#764ba2'
+},
+
     {
       number: '03',
       title: 'Build Your Safety Net',

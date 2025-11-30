@@ -1,3 +1,4 @@
+
 /* HeroSection.css */
 .hero-section {
   position: relative;
@@ -6,7 +7,7 @@
   align-items: center;
   padding: 120px 0 80px;
   overflow: hidden;
-  background: linear-gradient(180deg, #f8f9ff 0%, #ffffff 100%);
+  /* background: linear-gradient(120deg, rgb(229, 231, 241) 0%, #ffffff 100%); */
 }
 
 /* Background Shapes */
@@ -20,7 +21,7 @@
 .hero-shape {
   position: absolute;
   border-radius: 50%;
-  filter: blur(80px);
+  filter: blur(40px);
   opacity: 0.4;
   animation: float 20s ease-in-out infinite;
 }
@@ -28,7 +29,7 @@
 .shape-1 {
   width: 500px;
   height: 500px;
-  background: radial-gradient(circle, #667eea, transparent);
+  background: radial-gradient(circle, #9c92f3, transparent);
   top: -100px;
   right: -100px;
   animation-delay: 0s;
@@ -357,7 +358,7 @@
   position: absolute;
   width: 400px;
   height: 400px;
-  border: 2px dashed rgba(102, 126, 234, 0.2);
+  border: 7px dashed rgba(155, 155, 247, 0.14);
   border-radius: 50%;
   top: 50%;
   left: 50%;
