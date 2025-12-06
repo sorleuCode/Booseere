@@ -42,13 +42,13 @@
 .contact-info-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 15px;
-  margin-bottom: 60px;
+ gap: 35px; 
+  margin-bottom: 60px; 
 }
 
 .info-card {
   background: white;
-  padding: 40px 20px;
+  padding: 40px 22px;
   border-radius: 16px;
   text-align: center;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
@@ -64,7 +64,7 @@
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  background: linear-gradient(90deg, #0d36ed 0%, #764ba2 50%, #f093fb 100%);
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
@@ -80,14 +80,14 @@
 }
 
 .info-icon {
-  width: 80px;
-  height: 80px;
-  margin: 0 auto 20px;
+  width: 50px;
+  height: 50px;
+  margin: 0 auto 10px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2.2rem;
+  font-size: 1.5rem;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
@@ -98,7 +98,7 @@
 }
 
 .info-title {
-  font-size: 1.4rem;
+  font-size: 1rem;
   font-weight: 600;
   color: #1a1a2e;
   margin-bottom: 15px;
@@ -118,7 +118,7 @@
 }
 
 .info-details p {
-  margin: 8px 0;
+  margin: 2px 0;
   transition: transform 0.3s ease;
 }
 
