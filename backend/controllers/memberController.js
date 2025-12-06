@@ -71,70 +71,140 @@ const getMember = asyncHandler(async (req, res) => {
 // @route   POST /api/members
 // @access  Private/Admin
 const createMember = asyncHandler(async (req, res) => {
-  const {
-    fullName,
-    phone,
-    address,
-    position,
-    profileImage,
-  } = req.body;
+  try {
+    const {
+      fullName,
+      phone,
+      address,
+      position,
+      profileImage,
+    } = req.body;
 
-  // Check if member already exists
-  const existingMember = await Member.findOne({
-    phone
-  });
+    // Validate required fields
+    if (!fullName) {
+      res.status(400);
+      throw new Error('Full name is required');
+    }
 
-  if (existingMember) {
-    res.status(400);
-    throw new Error('Member with this phone already exists');
+    // Check if member already exists
+    const existingMember = await Member.findOne({ phone });
+
+    if (existingMember) {
+      res.status(400);
+      throw new Error('Member with this phone already exists');
+    }
+
+    // Generate unique membership number
+    let membershipNumber;
+    let isUnique = false;
+    let attempt = 0;
+    const maxAttempts = 10;
+
+    try {
+      // First, find the highest existing membership number
+      const highestMember = await Member.findOne()
+        .sort({ membershipNumber: -1 })
+        .select('membershipNumber');
+
+      let nextNumber = 1;
+      if (highestMember && highestMember.membershipNumber) {
+        const highestNum = parseInt(highestMember.membershipNumber.replace('COOP', ''));
+        nextNumber = highestNum + 1;
+      }
+
+      while (!isUnique && attempt < maxAttempts) {
+        membershipNumber = `COOP${String(nextNumber + attempt).padStart(4, '0')}`;
+
+        try {
+          // Check if this membership number already exists
+          const existingMember = await Member.findOne({ membershipNumber });
+          if (!existingMember) {
+            isUnique = true;
+          } else {
+            attempt++;
+          }
+        } catch (error) {
+          console.error('Error checking membership number uniqueness:', error);
+          attempt++;
+        }
+      }
+
+      if (!isUnique) {
+        res.status(500);
+        throw new Error('Unable to generate unique membership number after multiple attempts');
+      }
+    } catch (error) {
+      console.error('Error generating membership number:', error);
+      res.status(500);
+      throw new Error('Failed to generate membership number due to database error');
+    }
+
+    // Create member (profileImage comes from frontend Cloudinary upload)
+    const member = await Member.create({
+      fullName,
+      phone,
+      address,
+      position: position || 'Member',
+      membershipNumber,
+      profileImage: profileImage || '',
+      status: 'active',
+      joinDate: new Date(),
+    });
+
+    res.status(201).json({
+      success: true,
+      data: member,
+    });
+  } catch (error) {
+    console.error('Error in createMember:', error);
+    if (error.name === 'ValidationError') {
+      res.status(400);
+      throw new Error('Invalid member data provided');
+    } else if (error.code === 11000) {
+      res.status(409);
+      throw new Error('Duplicate membership number - please try again');
+    } else {
+      res.status(500);
+      throw new Error('Failed to create member due to server error');
+    }
   }
-
-  // Generate membership number
-  const memberCount = await Member.countDocuments();
-  const membershipNumber = `COOP${String(memberCount + 1).padStart(4, '0')}`;
-
-  // Create member (profileImage comes from frontend Cloudinary upload)
-  const member = await Member.create({
-    fullName,
-    phone,
-    address,
-    position: position || 'Member',
-    membershipNumber,
-    profileImage: profileImage || '',
-    status: 'active',
-    joinDate: new Date(),
-  });
-
-  res.status(201).json({
-    success: true,
-    data: member,
-  });
 });
 
 // @desc    Update member (Admin only)
 // @route   PUT /api/members/:id
 // @access  Private/Admin
 const updateMember = asyncHandler(async (req, res) => {
-  const member = await Member.findById(req.params.id);
+  try {
+    const member = await Member.findById(req.params.id);
 
-  if (!member) {
-    res.status(404);
-    throw new Error('Member not found');
+    if (!member) {
+      res.status(404);
+      throw new Error('Member not found');
+    }
+
+    // Update member (profileImage comes from frontend Cloudinary upload)
+    const updateData = { ...req.body };
+
+    const updatedMember = await Member.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      { new: true, runValidators: true }
+    );
+
+    res.json({
+      success: true,
+      data: updatedMember,
+    });
+  } catch (error) {
+    console.error('Error in updateMember:', error);
+    if (error.name === 'ValidationError') {
+      res.status(400);
+      throw new Error('Invalid member data provided');
+    } else {
+      res.status(500);
+      throw new Error('Failed to update member due to server error');
+    }
   }
-
-  // Update member (profileImage comes from frontend Cloudinary upload)
-  const updateData = { ...req.body };
-
-  const updatedMember = await Member.findByIdAndUpdate(
-    req.params.id,
-    updateData,
-    { new: true, runValidators: true }
-  );
-
-  res.json({
-    success: true,
-    data: updatedMember,
-  });
 });
 
 // @desc    Delete member (Admin only)
