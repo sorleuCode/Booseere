@@ -56,6 +56,7 @@ const PublicMembers = () => {
         
         <div className="search-filters">
           <div className="search-box">
+            <span className="search-icon">🔍</span>
             <input
               type="text"
               placeholder="Search by name or membership number..."
@@ -167,9 +168,23 @@ const PublicMembers = () => {
           justify-content: center;
           gap: 16px;
           flex-wrap: wrap;
+          margin-bottom: 30px;
+          align-items: center;
+        }
+        .search-box {
+          position: relative;
+          display: flex;
+          align-items: center;
+        }
+        .search-icon {
+          position: absolute;
+          left: 12px;
+          color: #9ca3af;
+          font-size: 1.2em;
+          pointer-events: none;
         }
         .search-box input {
-          padding: 12px 16px;
+          padding: 12px 16px 12px 40px; /* Added left padding for icon */
           border: 1px solid #d1d5db;
           border-radius: 8px;
           font-size: 1em;
@@ -179,6 +194,13 @@ const PublicMembers = () => {
           outline: none;
           border-color: #3b82f6;
           box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        .search-box input:focus + .search-icon {
+          color: #3b82f6;
+        }
+        .search-box input::placeholder {
+          color: #9ca3af;
+          font-size: 0.95em;
         }
         .position-filter select {
           padding: 12px 16px;
