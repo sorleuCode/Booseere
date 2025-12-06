@@ -3,6 +3,7 @@ import React from 'react';
 import './Aboutus.css';
 
 function Aboutus() {
+  const storyImageRef = React.useRef(null);
   const values = [
     {
       icon: '🤝',
@@ -44,8 +45,22 @@ function Aboutus() {
         <div className="about-content">
           {/* Left Column - Story */}
           <div className="about-story">
-            <div className="story-image">
-              <img src="/public/BOOSE.png" alt="Community gathering" />
+            <div className="story-image" ref={storyImageRef}>
+              <img
+                src="/BOOSE.png"
+                alt="Community gathering at Booseere Multipurpose Cooperative"
+                onLoad={() => console.log('Image loaded successfully')}
+                onError={(e) => {
+                  console.error('Image failed to load:', e);
+                  e.target.style.display = 'none';
+                  if (storyImageRef.current) {
+                    storyImageRef.current.classList.add('fallback');
+                    storyImageRef.current.textContent = 'Community Gathering';
+                  }
+                }}
+                loading="lazy"
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
               <div className="image-overlay">
                 <div className="overlay-stat">
                   <span className="stat-big">5+</span>

@@ -56,6 +56,7 @@ const PublicMembers = () => {
         
         <div className="search-filters">
           <div className="search-box">
+            <span className="search-icon">🔍</span>
             <input
               type="text"
               placeholder="Search by name or membership number..."
@@ -167,18 +168,54 @@ const PublicMembers = () => {
           justify-content: center;
           gap: 16px;
           flex-wrap: wrap;
+          margin-bottom: 30px;
+          align-items: center;
+        }
+        .search-box {
+          position: relative;
+          display: flex;
+          align-items: center;
+          width: 300px;
+          height: 48px;
+        }
+        .search-icon {
+          position: absolute;
+          left: 16px;
+          color: #9ca3af;
+          font-size: 1.2em;
+          pointer-events: none;
+          z-index: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: 100%;
         }
         .search-box input {
-          padding: 12px 16px;
+          padding: 12px 16px 12px 48px; /* Increased left padding for icon */
           border: 1px solid #d1d5db;
           border-radius: 8px;
           font-size: 1em;
           width: 300px;
+          position: relative;
+          z-index: 0;
         }
         .search-box input:focus {
           outline: none;
           border-color: #3b82f6;
           box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        .search-box input:focus + .search-icon {
+          color: #3b82f6;
+        }
+        .search-box:hover .search-icon {
+          color: #6b7280;
+        }
+        .search-box input:hover {
+          border-color: #9ca3af;
+        }
+        .search-box input::placeholder {
+          color: #9ca3af;
+          font-size: 0.95em;
         }
         .position-filter select {
           padding: 12px 16px;
