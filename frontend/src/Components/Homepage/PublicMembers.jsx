@@ -175,20 +175,29 @@ const PublicMembers = () => {
           position: relative;
           display: flex;
           align-items: center;
+          width: 300px;
+          height: 48px;
         }
         .search-icon {
           position: absolute;
-          left: 12px;
+          left: 16px;
           color: #9ca3af;
           font-size: 1.2em;
           pointer-events: none;
+          z-index: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: 100%;
         }
         .search-box input {
-          padding: 12px 16px 12px 40px; /* Added left padding for icon */
+          padding: 12px 16px 12px 48px; /* Increased left padding for icon */
           border: 1px solid #d1d5db;
           border-radius: 8px;
           font-size: 1em;
           width: 300px;
+          position: relative;
+          z-index: 0;
         }
         .search-box input:focus {
           outline: none;
@@ -197,6 +206,12 @@ const PublicMembers = () => {
         }
         .search-box input:focus + .search-icon {
           color: #3b82f6;
+        }
+        .search-box:hover .search-icon {
+          color: #6b7280;
+        }
+        .search-box input:hover {
+          border-color: #9ca3af;
         }
         .search-box input::placeholder {
           color: #9ca3af;
