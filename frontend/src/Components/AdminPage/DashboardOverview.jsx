@@ -126,7 +126,7 @@ function DashboardOverview() {
         </div>
 
         {dashboardLoading.stats ? (
-          <LoadingSpinner size="medium" text="Loading statistics..." />
+          <LoadingSpinner size="medium"/>
         ) : dashboardStats ? (
           <div className="stats-cards">
             <div className="stat-card">
@@ -176,11 +176,7 @@ function DashboardOverview() {
         </div>
 
         {(chartLoading || !dataLoaded || isInitialLoad) ? (
-          <LoadingSpinner size="medium" text={
-            chartLoading ? "Loading analytics..." :
-            isInitialLoad ? "Loading dashboard data..." :
-            "Preparing dashboard..."
-          } />
+          <LoadingSpinner size="medium"/>
         ) : (
           <div className="charts-grid">
             {/* Contribution Trend Chart */}
@@ -189,7 +185,7 @@ function DashboardOverview() {
               {chartData.contributionTrend && chartData.contributionTrend.length > 0 ? (
                 <ResponsiveContainer width="100%" height={250}>
                   <LineChart data={chartData.contributionTrend}>
-                    <CartesianGrid strokeDasharray="3 3" />
+                    {/* <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" strokeWidth={1} /> */}
                     <XAxis
                       dataKey="month"
                       fontSize={12}
