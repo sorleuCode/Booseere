@@ -167,10 +167,7 @@ function AdminRegister() {
           {/* Submit Button */}
           <button type="submit" className="register-button" disabled={isLoading}>
             {isLoading ? (
-              <>
-                <span className="loading-spinner"></span>
-                Creating Account...
-              </>
+              <span className="simple-loading-circle"></span>
             ) : (
               'Create Account'
             )}
