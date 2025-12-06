@@ -7,7 +7,7 @@ import Header from "./Header";
  import Benefit from "./Benefit";
  import Contact from "./Contact";
  import Footer from "./Footer";
-
+import Homemember from "./Homemember";
 function Home() {
   return (
  <div className="home-container">
@@ -18,6 +18,7 @@ function Home() {
 <Aboutus />
 <Howitwork />
 <Benefit />
+<Homemember />
 <Contact /> 
 <Footer />
 

@@ -50,19 +50,19 @@ function ContactSection() {
     {
       icon: '📍',
       title: 'Visit Us',
-      details: ['123 Unity Street', 'Community Plaza, CA 90210', 'United States'],
+      details: ['Lolese area, adjacent Tilers building, konda area, Ilobu, Osun state'],
       color: '#667eea'
     },
     {
       icon: '📧',
       title: 'Email Us',
-      details: ['info@unitycooperative.org', 'support@unitycooperative.org'],
+      details: ['booseeremultipurpose@gmail.com'],
       color: '#764ba2'
     },
     {
       icon: '📞',
       title: 'Call Us',
-      details: ['+1 (555) 123-4567', '+1 (555) 987-6543', 'Mon-Fri: 9AM - 6PM'],
+      details: ['+2348164586149', '+2348065447490'],
       color: '#f093fb'
     }
   ];
