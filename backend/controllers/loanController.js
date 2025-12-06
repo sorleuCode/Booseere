@@ -211,11 +211,16 @@ const addRepayment = asyncHandler(async (req, res) => {
   });
 
   loan.amountPaid += amount;
-  loan.outstandingBalance -= amount;
+  // Note: outstandingBalance will be recalculated by the pre-save hook
 
-  // Update status
-  if (loan.outstandingBalance === 0) {
+  // Update status - use a small threshold to handle floating point precision
+  const newOutstandingBalance = loan.totalAmount - (loan.amountPaid + amount);
+  console.log(`Loan repayment: amount=${amount}, totalAmount=${loan.totalAmount}, amountPaid=${loan.amountPaid}, newOutstandingBalance=${newOutstandingBalance}`);
+
+  if (newOutstandingBalance <= 0.01) {  // Consider anything <= 0.01 as fully repaid
+    console.log('Loan fully repaid - setting status to completed');
     loan.status = 'completed';
+    loan.outstandingBalance = 0;  // Ensure it's exactly 0
   } else {
     loan.status = 'repaying';
   }
