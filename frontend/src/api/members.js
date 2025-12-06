@@ -17,7 +17,9 @@ export const memberAPI = {
   // Add a new member
   create: async (memberData) => {
     const response = await api.post('/members', memberData);
+    console.log(response.data);
     return response.data;
+    
   },
 
   // Update a member

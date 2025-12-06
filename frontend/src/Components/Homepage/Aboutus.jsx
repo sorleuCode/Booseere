@@ -45,10 +45,10 @@ function Aboutus() {
           {/* Left Column - Story */}
           <div className="about-story">
             <div className="story-image">
-              <img src="/BOOSE.png" alt="Community gathering" />
+              <img src="/public/BOOSE.png" alt="Community gathering" />
               <div className="image-overlay">
                 <div className="overlay-stat">
-                  <span className="stat-big">3+</span>
+                  <span className="stat-big">5+</span>
                   <span className="stat-small">Years of Impact</span>
                 </div>
               </div>

@@ -260,67 +260,77 @@ const ContributionManagement = () => {
       {/* Search and Filter Controls */}
       <div className="filters-section">
         <div className="search-box">
-          <input
-            type="text"
-            placeholder="Search by receipt number, member name, type..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="search-input"
-          />
+          <div className="contribution-search-wrapper">
+            <input
+              type="text"
+              placeholder="Search by receipt number, member name, type..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="contribution-search-input"
+            />
+          </div>
         </div>
 
         <div className="filter-controls">
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="filter-select"
-          >
-            <option value="all">All Status</option>
-            <option value="verified">Verified</option>
-            <option value="pending">Pending</option>
-            <option value="rejected">Rejected</option>
-          </select>
+          <div className="filter-wrapper">
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="contribution-filter-select"
+            >
+              <option value="all">All Status</option>
+              <option value="verified">Verified</option>
+              <option value="pending">Pending</option>
+              <option value="rejected">Rejected</option>
+            </select>
+          </div>
 
-          <select
-            value={typeFilter}
-            onChange={(e) => setTypeFilter(e.target.value)}
-            className="filter-select"
-          >
-            <option value="all">All Types</option>
-            <option value="monthly">Monthly</option>
-            <option value="special">Special</option>
-            <option value="registration">Registration</option>
-            <option value="fine">Fine</option>
-            <option value="other">Other</option>
-          </select>
+          <div className="filter-wrapper">
+            <select
+              value={typeFilter}
+              onChange={(e) => setTypeFilter(e.target.value)}
+              className="contribution-filter-select"
+            >
+              <option value="all">All Types</option>
+              <option value="monthly">Monthly</option>
+              <option value="special">Special</option>
+              <option value="registration">Registration</option>
+              <option value="fine">Fine</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
 
-          <select
-            value={memberFilter}
-            onChange={(e) => setMemberFilter(e.target.value)}
-            className="filter-select"
-          >
-            <option value="all">All Members</option>
-            {members.map(member => (
-              <option key={member._id} value={member._id}>
-                {member.fullName}
-              </option>
-            ))}
-          </select>
+          <div className="filter-wrapper">
+            <select
+              value={memberFilter}
+              onChange={(e) => setMemberFilter(e.target.value)}
+              className="contribution-filter-select"
+            >
+              <option value="all">All Members</option>
+              {members.map(member => (
+                <option key={member._id} value={member._id}>
+                  {member.fullName}
+                </option>
+              ))}
+            </select>
+          </div>
 
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="filter-select"
-          >
-            <option value="paymentDate">Sort by Date</option>
-            <option value="amount">Sort by Amount</option>
-            <option value="memberName">Sort by Member</option>
-            <option value="receiptNumber">Sort by Receipt</option>
-          </select>
+          <div className="filter-wrapper">
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="contribution-filter-select"
+            >
+              <option value="paymentDate">Sort by Date</option>
+              <option value="amount">Sort by Amount</option>
+              <option value="memberName">Sort by Member</option>
+              <option value="receiptNumber">Sort by Receipt</option>
+            </select>
+          </div>
 
           <button
             onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-            className="sort-toggle"
+            className="contribution-sort-toggle"
           >
             {sortOrder === 'asc' ? '↑' : '↓'}
           </button>
@@ -576,58 +586,179 @@ const ContributionManagement = () => {
         }
 
         .filters-section {
-          background: white;
-          padding: 20px;
-          border-radius: 8px;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+          background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.8));
+          padding: 24px;
+          border-radius: 20px;
+          box-shadow: 
+            0 4px 20px rgba(0, 0, 0, 0.08),
+            0 1px 3px rgba(0, 0, 0, 0.1),
+            inset 0 1px 0 rgba(255, 255, 255, 0.6);
+          backdrop-filter: blur(10px);
+          border: 1px solid rgba(226, 232, 240, 0.8);
+          margin-bottom: 24px;
+          position: relative;
+        }
+
+        .filters-section::before {
+          content: '💰 Filter & Search Contributions';
+          display: block;
+          text-align: center;
+          font-size: 0.95rem;
+          color: #059669;
           margin-bottom: 20px;
+          font-weight: 600;
+          opacity: 0.9;
         }
 
         .search-box {
-          margin-bottom: 15px;
+          margin-bottom: 20px;
         }
 
-        .search-input {
+        .contribution-search-wrapper {
+          position: relative;
           width: 100%;
-          padding: 12px 16px;
-          border: 1px solid #d1d5db;
-          border-radius: 6px;
-          font-size: 16px;
         }
 
-        .search-input:focus {
+        .contribution-search-wrapper::before {
+          content: '💳';
+          position: absolute;
+          right: 16px;
+          top: 50%;
+          transform: translateY(-50%);
+          font-size: 18px;
+          z-index: 2;
+          color: #94a3b8;
+          transition: all 0.3s ease;
+          pointer-events: none;
+        }
+
+        .contribution-search-wrapper:focus-within::before {
+          color: #059669;
+          transform: translateY(-50%) scale(1.1);
+        }
+
+        .contribution-search-input {
+          width: 100%;
+          padding: 16px 48px 16px 20px;
+          border: 2px solid #e2e8f0;
+          border-radius: 16px;
+          font-size: 16px;
+          background: #ffffff;
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+          font-weight: 500;
+        }
+
+        .contribution-search-input:focus {
           outline: none;
-          border-color: #4f9cf9;
-          box-shadow: 0 0 0 3px rgba(79, 156, 249, 0.1);
+          border-color: #059669;
+          box-shadow: 
+            0 4px 20px rgba(5, 150, 105, 0.15),
+            0 0 0 4px rgba(5, 150, 105, 0.1);
+          transform: translateY(-2px);
+          background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        }
+
+        .contribution-search-input::placeholder {
+          color: #94a3b8;
+          font-weight: 400;
         }
 
         .filter-controls {
           display: flex;
-          gap: 10px;
+          gap: 16px;
           align-items: center;
           flex-wrap: wrap;
         }
 
-        .filter-select {
-          padding: 8px 12px;
-          border: 1px solid #d1d5db;
-          border-radius: 4px;
-          font-size: 14px;
-          min-width: 120px;
+        .filter-wrapper {
+          position: relative;
+          min-width: 140px;
         }
 
-        .sort-toggle {
-          padding: 8px 12px;
-          background: #f3f4f6;
-          border: 1px solid #d1d5db;
-          border-radius: 4px;
-          cursor: pointer;
+        .filter-wrapper::before {
+          content: '';
+          position: absolute;
+          left: 16px;
+          top: 50%;
+          transform: translateY(-50%);
+          font-size: 16px;
+          z-index: 1;
+          color: #94a3b8;
+          transition: all 0.3s ease;
+          pointer-events: none;
+        }
+
+        .filter-wrapper:nth-child(1)::before { content: '✅'; }
+        .filter-wrapper:nth-child(2)::before { content: '📋'; }
+        .filter-wrapper:nth-child(3)::before { content: '👤'; }
+        .filter-wrapper:nth-child(4)::before { content: '📅'; }
+
+        .filter-wrapper:focus-within::before {
+          color: #059669;
+          transform: translateY(-50%) scale(1.1);
+        }
+
+        .contribution-filter-select {
+          width: 100%;
+          padding: 12px 16px 12px 44px;
+          border: 2px solid #e2e8f0;
+          border-radius: 12px;
           font-size: 14px;
+          background: #ffffff;
+          cursor: pointer;
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+          appearance: none;
+          -webkit-appearance: none;
+          -moz-appearance: none;
+          background-image: url("data:image/svg+xml;charset=US-ASCII,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6,9 12,15 18,9'></polyline></svg>");
+          background-repeat: no-repeat;
+          background-position: right 12px center;
+          background-size: 14px;
           font-weight: 600;
         }
 
-        .sort-toggle:hover {
-          background: #e5e7eb;
+        .contribution-filter-select:hover {
+          border-color: #10b981;
+          box-shadow: 0 4px 15px rgba(16, 185, 129, 0.15);
+          transform: translateY(-1px);
+        }
+
+        .contribution-filter-select:focus {
+          outline: none;
+          border-color: #059669;
+          box-shadow: 
+            0 4px 20px rgba(5, 150, 105, 0.15),
+            0 0 0 4px rgba(5, 150, 105, 0.1);
+        }
+
+        .contribution-sort-toggle {
+          padding: 12px 16px;
+          background: linear-gradient(135deg, #059669, #10b981);
+          border: none;
+          border-radius: 12px;
+          cursor: pointer;
+          font-size: 16px;
+          font-weight: 700;
+          color: white;
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+          box-shadow: 0 4px 15px rgba(5, 150, 105, 0.3);
+          min-width: 50px;
+          height: 48px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .contribution-sort-toggle:hover {
+          background: linear-gradient(135deg, #047857, #059669);
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(5, 150, 105, 0.4);
+        }
+
+        .contribution-sort-toggle:active {
+          transform: translateY(0);
         }
 
         /* Responsive Design */
@@ -652,17 +783,31 @@ const ContributionManagement = () => {
           }
 
           .filters-section {
-            padding: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+          }
+
+          .filters-section::before {
+            font-size: 0.9rem;
+            margin-bottom: 16px;
           }
 
           .filter-controls {
             flex-direction: column;
             align-items: stretch;
+            gap: 12px;
           }
 
-          .filter-select {
+          .filter-wrapper,
+          .contribution-search-wrapper {
             min-width: auto;
             width: 100%;
+          }
+
+          .contribution-search-input,
+          .contribution-filter-select {
+            width: 100%;
+            min-width: auto;
           }
 
           .contribution-stats {
@@ -676,10 +821,6 @@ const ContributionManagement = () => {
 
           .contribution-table {
             overflow-x: auto;
-          }
-
-          table {
-            min-width: 600px;
           }
 
           th, td {
@@ -783,10 +924,12 @@ const ContributionManagement = () => {
           border-radius: 8px;
           overflow: hidden;
           box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+          overflow-x: auto;
         }
         table {
           width: 100%;
           border-collapse: collapse;
+          min-width: 800px;
         }
         th, td {
           padding: 12px;

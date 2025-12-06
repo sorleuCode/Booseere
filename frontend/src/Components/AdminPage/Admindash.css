@@ -1058,6 +1058,503 @@
   transform: scale(1.02);
 }
 
+/* Create Loan Button */
+.btn-create-loan {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-create-loan:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(16, 185, 129, 0.3);
+}
+
+/* Danger Button */
+.btn-danger {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: #ffffff;
+  border: none;
+}
+
+.btn-danger:hover {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(239, 68, 68, 0.3);
+}
+
+/* Loading Button State */
+.btn-loading {
+  opacity: 0.7;
+  cursor: not-allowed;
+  position: relative;
+}
+
+.btn-loading::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  margin: auto;
+  border: 2px solid transparent;
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Refresh Button */
+.btn-refresh {
+  padding: 8px 16px;
+  background: #f8f9ff;
+  border: 2px solid #e8eaf6;
+  border-radius: 8px;
+  color: #667eea;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-refresh:hover:not(:disabled) {
+  background: #e8eaf6;
+  border-color: #667eea;
+  transform: translateY(-2px);
+}
+
+.btn-refresh:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Mark as Read Button */
+.btn-mark-read {
+  padding: 6px 12px;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-mark-read:hover {
+  background: linear-gradient(135deg, #059669, #047857);
+  transform: translateY(-1px);
+}
+
+/* Mark as Replied Button */
+.btn-mark-replied {
+  padding: 6px 12px;
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-mark-replied:hover {
+  background: linear-gradient(135deg, #7c3aed, #6d28d9);
+  transform: translateY(-1px);
+}
+
+/* Delete Button */
+.btn-delete {
+  padding: 6px 12px;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-delete:hover {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  transform: translateY(-1px);
+}
+
+/* Export Button */
+.btn-export {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-export:hover:not(:disabled) {
+  background: linear-gradient(135deg, #d97706, #b45309);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(245, 158, 11, 0.3);
+}
+
+.btn-export:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Add Admin Button */
+.btn-add-admin {
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-add-admin:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+}
+
+/* Sidebar Notes Buttons */
+.notes-toggle-btn {
+  padding: 10px 16px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+}
+
+.notes-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.sidebar-btn-add {
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.sidebar-btn-add:hover {
+  background: linear-gradient(135deg, #059669, #047857);
+}
+
+.sidebar-btn-save {
+  padding: 6px 12px;
+  background: #10b981;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.sidebar-btn-save:hover {
+  background: #059669;
+}
+
+.sidebar-btn-cancel {
+  padding: 6px 12px;
+  background: #ef4444;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.sidebar-btn-cancel:hover {
+  background: #dc2626;
+}
+
+.sidebar-btn-edit {
+  padding: 4px 8px;
+  background: #fef3c7;
+  color: #92400e;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.sidebar-btn-edit:hover {
+  background: #fde68a;
+}
+
+.sidebar-btn-delete {
+  padding: 4px 8px;
+  background: #fee;
+  color: #c33;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.sidebar-btn-delete:hover {
+  background: #fcc;
+}
+
+/* Edit Button (general) */
+.btn-edit {
+  padding: 6px 12px;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-edit:hover {
+  background: linear-gradient(135deg, #d97706, #b45309);
+  transform: translateY(-1px);
+}
+
+/* Tab Buttons */
+.tab-button {
+  padding: 12px 24px;
+  background: #f8f9ff;
+  border: 2px solid #e8eaf6;
+  border-radius: 8px;
+  color: #667eea;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-right: 8px;
+  margin-bottom: 8px;
+}
+
+.tab-button:hover {
+  background: #e8eaf6;
+  border-color: #667eea;
+}
+
+.tab-button.active {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #ffffff;
+  border-color: transparent;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+/* Filters Section */
+.filters-section {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e8eaf6;
+}
+
+/* Search Box */
+.search-box {
+  flex: 1;
+  min-width: 300px;
+  position: relative;
+}
+
+.search-input {
+  width: 100%;
+  padding: 14px 20px 14px 45px;
+  font-size: 15px;
+  color: #1a1a1a;
+  background: #f8f9ff;
+  border: 2px solid #e8eaf6;
+  border-radius: 12px;
+  outline: none;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.search-input::placeholder {
+  color: #94a3b8;
+}
+
+.search-input:focus {
+  border-color: #667eea;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+  transform: translateY(-2px);
+}
+
+.search-box::before {
+  content: '🔍';
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 16px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Filter Controls */
+.filter-controls {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filter-select {
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a1a;
+  background: #f8f9ff;
+  border: 2px solid #e8eaf6;
+  border-radius: 10px;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 150px;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23667eea' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+  padding-right: 40px;
+}
+
+.filter-select:hover {
+  border-color: #a855f7;
+  background: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(168, 85, 247, 0.15);
+}
+
+.filter-select:focus {
+  border-color: #667eea;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+}
+
+/* Sort Toggle */
+.sort-toggle {
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 50px;
+  height: 44px;
+}
+
+.sort-toggle:hover {
+  background: linear-gradient(135deg, #5568d3, #6b46c1);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(102, 126, 234, 0.3);
+}
+
+.sort-toggle:active {
+  transform: translateY(0);
+}
+
+/* Empty and Loading States for Filters */
+.filters-section:empty::after {
+  content: 'No filters available';
+  display: block;
+  text-align: center;
+  padding: 20px;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+/* Upload Progress Styles */
+.upload-progress {
+  margin-top: 12px;
+  padding: 8px;
+  background: #f8fafc;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  font-size: 0.75em;
+  color: #64748b;
+  font-weight: 500;
+}
+
 .modal-form input,
 .modal-form select {
   padding: 14px;
@@ -1121,16 +1618,59 @@
 
   .admin-sidebar {
     width: 100%;
-    padding: 20px;
+    padding: 16px;
+  }
+
+  .sidebar-brand {
+    padding: 16px;
+  }
+
+  .sidebar-brand h3 {
+    font-size: 16px;
+  }
+
+  .sidebar-brand p {
+    font-size: 11px;
+  }
+
+  .brand-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .brand-icon svg {
+    width: 24px;
+    height: 24px;
   }
 
   .sidebar-menu {
     flex-direction: row;
     overflow-x: auto;
+    gap: 6px;
+  }
+
+  .menu-item {
+    padding: 10px 12px;
+    font-size: 13px;
+    white-space: nowrap;
+    min-width: fit-content;
+  }
+
+  .item-icon {
+    font-size: 16px;
   }
 
   .admin-main {
-    padding: 20px;
+    padding: 16px;
+  }
+
+  .top-bar h1 {
+    font-size: 22px;
+  }
+
+  .admin-user {
+    padding: 8px 16px;
+    font-size: 12px;
   }
 
   .stats-cards {
@@ -1139,6 +1679,40 @@
 
   .members-grid {
     grid-template-columns: 1fr;
+  }
+
+  .members-header h2 {
+    font-size: 20px;
+  }
+
+  .btn-add-member {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+
+  .member-card {
+    padding: 20px;
+  }
+
+  .member-card h3 {
+    font-size: 16px;
+  }
+
+  .member-email {
+    font-size: 13px;
+  }
+
+  .mini-label {
+    font-size: 10px;
+  }
+
+  .mini-value {
+    font-size: 13px;
+  }
+
+  .status-pill {
+    padding: 5px 12px;
+    font-size: 11px;
   }
 
   .detail-header {
@@ -1161,6 +1735,221 @@
 
   .modal-content {
     width: 95%;
-    padding: 24px;
+    padding: 20px;
+  }
+
+  /* Note section responsive */
+  .note-section {
+    padding: 16px;
+  }
+
+  .add-note-box {
+    padding: 16px;
+  }
+
+  .note-input {
+    padding: 12px;
+    font-size: 14px;
+  }
+
+  .btn-add-note {
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+
+  .notes-history h3 {
+    font-size: 16px;
+  }
+
+  .note-item {
+    padding: 12px;
+  }
+
+  .note-content p {
+    font-size: 14px;
+  }
+
+  .note-date,
+  .note-time {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-sidebar {
+    padding: 12px;
+  }
+
+  .sidebar-brand {
+    padding: 12px;
+  }
+
+  .sidebar-brand h3 {
+    font-size: 14px;
+  }
+
+  .sidebar-brand p {
+    font-size: 10px;
+  }
+
+  .brand-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .brand-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .menu-item {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+
+  .item-icon {
+    font-size: 14px;
+  }
+
+  .admin-main {
+    padding: 12px;
+  }
+
+  .top-bar h1 {
+    font-size: 18px;
+  }
+
+  .admin-user {
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+
+  /* Note section mobile */
+  .note-section {
+    padding: 12px;
+  }
+
+  .add-note-box {
+    padding: 12px;
+  }
+
+  .note-input {
+    padding: 10px;
+    font-size: 13px;
+  }
+
+  .btn-add-note {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  .notes-history h3 {
+    font-size: 14px;
+  }
+
+  .note-item {
+    padding: 10px;
+  }
+
+  .note-content p {
+    font-size: 13px;
+  }
+
+  .note-date,
+  .note-time {
+    font-size: 11px;
+  }
+
+  .btn-delete-note,
+  .btn-edit-note {
+    padding: 4px 8px;
+    font-size: 14px;
+  }
+
+  .btn-refresh {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+
+  .btn-create-loan,
+  .btn-export,
+  .btn-add-admin {
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+
+  .btn-mark-read,
+  .btn-mark-replied,
+  .btn-delete,
+  .btn-edit {
+    padding: 5px 10px;
+    font-size: 12px;
+  }
+
+  .tab-button {
+    padding: 8px 16px;
+    font-size: 13px;
+    margin-right: 6px;
+    margin-bottom: 6px;
+  }
+
+  .sidebar-btn-add {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  .sidebar-btn-save,
+  .sidebar-btn-cancel {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+
+  /* Members section mobile */
+  .members-header h2 {
+    font-size: 18px;
+  }
+
+  .btn-add-member {
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+
+  .member-card {
+    padding: 16px;
+  }
+
+  .member-card h3 {
+    font-size: 15px;
+  }
+
+  .member-email {
+    font-size: 12px;
+  }
+
+  .mini-label {
+    font-size: 9px;
+  }
+
+  .mini-value {
+    font-size: 12px;
+  }
+
+  .status-pill {
+    padding: 4px 10px;
+    font-size: 10px;
+  }
+
+  .member-photo {
+    width: 60px;
+    height: 60px;
+  }
+
+  .member-stats {
+    padding: 8px 0;
+  }
+
+  .modal-content {
+    width: 98%;
+    padding: 16px;
   }
 }

@@ -6,12 +6,6 @@ const memberSchema = new mongoose.Schema({
     required: [true, 'Please add full name'],
     trim: true,
   },
-  email: {
-    type: String,
-    required: [true, 'Please add an email'],
-    lowercase: true,
-    match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please add a valid email'],
-  },
   phone: {
     type: String,
     required: false,
