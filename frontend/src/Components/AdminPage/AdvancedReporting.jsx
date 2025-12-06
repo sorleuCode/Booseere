@@ -79,7 +79,7 @@ const AdvancedReporting = () => {
   };
 
   if (loading && !reports) {
-    return <LoadingSpinner size="large" text="Loading financial reports..." />;
+    return <LoadingSpinner size="large" />;
   }
 
   return (
