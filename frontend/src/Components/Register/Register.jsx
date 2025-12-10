@@ -8,7 +8,6 @@ import './Register.css';
 
 function AdminRegister() {
   const navigate = useNavigate();
-  const { login } = useAuth();
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -52,9 +51,7 @@ function AdminRegister() {
         password: formData.password
       });
 
-      // Store the JWT token from backend
-      // Use AuthContext to handle login
-        login(response.data.user || { email: formData.email }, response.data.token);
+      toast.success('Registration successful! Please login.');
       navigate('/login');
     } catch (err) {
       // Show toast notification for registration errors
