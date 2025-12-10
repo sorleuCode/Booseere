@@ -176,7 +176,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
   await user.save();
 
   try {
-    await sendPasswordResetEmail(user.email, resetToken);
+    await sendPasswordResetEmail(user.email, user.fullName, resetToken);
     res.json({
       success: true,
       message: 'Password reset email sent',
