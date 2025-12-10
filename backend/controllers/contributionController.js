@@ -64,9 +64,59 @@ const createContribution = asyncHandler(async (req, res) => {
     throw new Error('Member not found');
   }
 
-  // Generate receipt number
-  const contributionCount = await Contribution.countDocuments();
-  const receiptNumber = `RCP${new Date().getFullYear()}${String(contributionCount + 1).padStart(5, '0')}`;
+  // Generate unique receipt number with retry logic for duplicates
+  let receiptNumber;
+  let retryCount = 0;
+  const maxRetries = 5;
+
+  while (retryCount < maxRetries) {
+    try {
+      // Get the current year and find the highest receipt number for this year
+      const currentYear = new Date().getFullYear();
+      const lastContribution = await Contribution.findOne(
+        { receiptNumber: { $regex: `^RCP${currentYear}` } },
+        { receiptNumber: 1 },
+        { sort: { receiptNumber: -1 } }
+      );
+
+      let nextNumber = 1;
+      if (lastContribution && lastContribution.receiptNumber) {
+        const lastNumber = parseInt(lastContribution.receiptNumber.slice(9));
+        nextNumber = lastNumber + 1;
+      }
+
+      receiptNumber = `RCP${currentYear}${String(nextNumber).padStart(5, '0')}`;
+
+      // Try to create the contribution to check for duplicates
+      const testContribution = new Contribution({
+        receiptNumber,
+        memberId,
+        amount,
+        contributionType,
+        paymentMethod,
+        paymentDate: paymentDate || Date.now(),
+        notes,
+        recordedBy: req.user._id,
+        status: 'verified',
+      });
+
+      await testContribution.validate();
+      break; // Success, exit the retry loop
+    } catch (error) {
+      if (error.code === 11000 && error.keyPattern && error.keyPattern.receiptNumber) {
+        // Duplicate key error, retry with next number
+        retryCount++;
+        if (retryCount >= maxRetries) {
+          res.status(409);
+          throw new Error('Unable to generate unique receipt number after multiple attempts');
+        }
+        continue;
+      } else {
+        // Other validation errors
+        throw error;
+      }
+    }
+  }
 
   const contribution = await Contribution.create({
     memberId,

@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { useDashboard } from '../../context/DashboardContext';
 import { useConfirm } from '../../hooks';
-import { formatDate, formatRelativeTime } from '../../utils/dateUtils';
+import { formatRelativeTime } from '../../utils/dateUtils';
 import './AdminNotesSidebar.css';
 
 function AdminNotesSidebar({ isExpanded, onToggle }) {
   const { notes: noteHistory, loading: dashboardLoading, deleteNote, addNote, updateNote } = useDashboard();
-  const { confirm, confirmState } = useConfirm();
+  const { confirm } = useConfirm();
   const [newNote, setNewNote] = useState("");
   const [noteLoading, setNoteLoading] = useState(false);
   const [editingNote, setEditingNote] = useState(null);

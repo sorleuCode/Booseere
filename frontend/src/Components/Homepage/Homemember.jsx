@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 export default function MembersSection() {
-  const [isHovered, setIsHovered] = useState(false);
 
   return (
     <>
@@ -283,16 +282,14 @@ export default function MembersSection() {
           </div>
 
           <div className="members-cta-section">
-            <a 
-              href="/public-members" 
+            <a
+              href="/public-members"
               className="explore-button"
-              onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
             >
               <span>Check our Members</span>
               <span className="button-arrow">→</span>
             </a>
-           
+
           </div>
         </div>
       </section>

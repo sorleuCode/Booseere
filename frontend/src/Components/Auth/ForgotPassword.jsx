@@ -20,10 +20,10 @@ const ForgotPassword = () => {
         setMessage('Password reset instructions have been sent to your email.');
         setEmail('');
       } else {
-        setError(result.message || 'Failed to send reset instructions');
+        toast.error(result.message || 'Failed to send reset instructions');
       }
-    } catch (err) {
-      setError('Failed to send reset instructions. Please try again.');
+    } catch {
+      toast.error('Failed to send reset instructions. Please try again.');
     } finally {
       setLoading(false);
     }

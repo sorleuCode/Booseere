@@ -147,8 +147,8 @@ const LoanManagement = () => {
           setSelectedLoan(null);
         }
       } catch (err) {
+        toast.error('Failed to reject loan');
         console.error('Error rejecting loan:', err);
-        alert('Failed to reject loan');
       }
     }
   };
@@ -164,8 +164,8 @@ const LoanManagement = () => {
         setSelectedLoan(null);
       }
     } catch (err) {
+      toast.error('Failed to disburse loan');
       console.error('Error disbursing loan:', err);
-      alert('Failed to disburse loan');
     }
   };
 

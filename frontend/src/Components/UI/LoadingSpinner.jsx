@@ -4,9 +4,10 @@ import './LoadingSpinner.css';
 const LoadingSpinner = ({
   size = 'medium',
   color = 'primary',
-  overlay = false
+  overlay = false,
+  className = ''
 }) => {
-  const spinnerClass = `loading-spinner-container ${size} ${color} ${overlay ? 'overlay' : ''}`;
+  const spinnerClass = `loading-spinner-container ${size} ${color} ${overlay ? 'overlay' : ''} ${className}`;
 
   return (
     <div className={spinnerClass}>

@@ -48,7 +48,9 @@ export const MembersProvider = ({ children }) => {
   const handleAddMember = async (memberData) => {
     if (!isAuthenticated) return null; // safety check
     try {
-      const newMember = await addMember(memberData);
+      const response = await addMember(memberData);
+      // Extract the actual member data from the response
+      const newMember = response.data || response;
       setMembers(prev => [...prev, newMember]);
       return newMember;
     } catch (err) {

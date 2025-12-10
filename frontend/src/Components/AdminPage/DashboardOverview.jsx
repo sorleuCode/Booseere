@@ -4,7 +4,6 @@ import { useConfirm } from '../../hooks';
 import { adminAPI } from '../../api/admin';
 import { formatDate } from '../../utils/dateUtils';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import LoadingSpinner from '../UI/LoadingSpinner';
 import ConfirmModal from '../UI/ConfirmModal';
 
 function DashboardOverview() {
@@ -126,7 +125,12 @@ function DashboardOverview() {
         </div>
 
         {dashboardLoading.stats ? (
-          <LoadingSpinner size="medium"/>
+          <div className="dashboard-loading">
+            <div className="progress-bar">
+              <div className="progress-fill"></div>
+            </div>
+            <p>Loading statistics...</p>
+          </div>
         ) : dashboardStats ? (
           <div className="stats-cards">
             <div className="stat-card">
@@ -176,7 +180,14 @@ function DashboardOverview() {
         </div>
 
         {(chartLoading || !dataLoaded || isInitialLoad) ? (
-          <LoadingSpinner size="medium"/>
+          <div className="charts-loading">
+            <div className="pulse-loader">
+              <div className="pulse-dot"></div>
+              <div className="pulse-dot"></div>
+              <div className="pulse-dot"></div>
+            </div>
+            <p>Loading charts...</p>
+          </div>
         ) : (
           <div className="charts-grid">
             {/* Contribution Trend Chart */}
@@ -261,3 +272,107 @@ function DashboardOverview() {
 }
 
 export default DashboardOverview;
+
+// Add CSS styles for the progress bar loading indicator
+<style jsx>{`
+  .dashboard-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    min-height: 300px;
+    width: 100%;
+  }
+
+  .progress-bar {
+    width: 100%;
+    max-width: 400px;
+    height: 6px;
+    background-color: #e5e7eb;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+    position: relative;
+  }
+
+  .progress-fill {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, #4f9cf9, #6366f1);
+    background-size: 200% 100%;
+    animation: progressAnimation 2s linear infinite;
+    border-radius: 3px;
+  }
+
+  .dashboard-loading p {
+    color: #4f9cf9;
+    font-weight: 500;
+    font-size: 1rem;
+    margin: 0;
+    text-align: center;
+  }
+
+  /* Charts Loading - Pulse Loader */
+  .charts-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    min-height: 300px;
+    width: 100%;
+  }
+
+  .pulse-loader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1rem;
+    gap: 8px;
+  }
+
+  .pulse-dot {
+    width: 12px;
+    height: 12px;
+    background-color: #4f9cf9;
+    border-radius: 50%;
+    animation: pulse 1.4s infinite ease-in-out;
+  }
+
+  .pulse-dot:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+
+  .pulse-dot:nth-child(3) {
+    animation-delay: 0.4s;
+  }
+
+  @keyframes pulse {
+    0%, 80%, 100% {
+      transform: scale(0.8);
+      opacity: 0.6;
+    }
+    40% {
+      transform: scale(1.2);
+      opacity: 1;
+    }
+  }
+
+  .charts-loading p {
+    color: #6366f1;
+    font-weight: 500;
+    font-size: 1rem;
+    margin: 0;
+    text-align: center;
+  }
+
+  @keyframes progressAnimation {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+`}</style>
