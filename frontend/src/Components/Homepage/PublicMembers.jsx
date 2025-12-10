@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { memberAPI } from '../../api/members';
 import LoadingSpinner from '../UI/LoadingSpinner';
+import { toast } from 'react-toastify';
 
 const PublicMembers = () => {
   const [members, setMembers] = useState([]);
@@ -19,7 +20,7 @@ const PublicMembers = () => {
       });
       setMembers(response.data || response);
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to load members');
+      toast.error(err.response?.data?.message || 'Failed to load members');
       console.error('Error loading public members:', err);
     } finally {
       setLoading(false);

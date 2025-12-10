@@ -1,6 +1,7 @@
 // components/ContactSection.js
 import React, { useState } from 'react';
 import { contactAPI } from '../../api/contact';
+import { toast } from 'react-toastify';
 import './Contact.css';
 
 function ContactSection() {

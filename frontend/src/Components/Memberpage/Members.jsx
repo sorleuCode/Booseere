@@ -3,8 +3,6 @@ import { getPublicMembers } from "../../api/members";
 import "./Members.css";
 import Footer from "../Homepage/Footer";
 
-const filterTypes = ["Exco", "Member"];
-
 function formatPhoneForWhatsApp(phone = "") {
   const digits = phone.replace(/\D/g, "");
   if (digits.startsWith("0")) return "234" + digits.slice(1);

@@ -27,13 +27,13 @@ const ResetPassword = () => {
     setMessage('');
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      toast.error('Passwords do not match');
       setLoading(false);
       return;
     }
 
     if (password.length < 6) {
-      setError('Password must be at least 6 characters long');
+      toast.error('Password must be at least 6 characters long');
       setLoading(false);
       return;
     }
@@ -46,10 +46,10 @@ const ResetPassword = () => {
           navigate('/login');
         }, 2000);
       } else {
-        setError(result.message || 'Failed to reset password');
+        toast.error(result.message || 'Failed to reset password');
       }
-    } catch (err) {
-      setError('Failed to reset password. The token may be invalid or expired.');
+    } catch {
+      toast.error('Failed to reset password. The token may be invalid or expired.');
     } finally {
       setLoading(false);
     }

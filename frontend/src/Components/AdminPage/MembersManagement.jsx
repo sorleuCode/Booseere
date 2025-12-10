@@ -3,7 +3,7 @@ import { useMembers } from '../../context/MembersContext';
 import { useConfirm } from '../../hooks';
 import { uploadToCloudinary } from '../../services/cloudinaryService';
 import { loanAPI } from '../../api/loans';
-import { formatDateTime, formatDate } from '../../utils/dateUtils';
+import { formatDateTime } from '../../utils/dateUtils';
 import LoadingSpinner from '../UI/LoadingSpinner';
 import ConfirmModal from '../UI/ConfirmModal';
 
@@ -244,8 +244,8 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
       await handleUpdateMember(selectedMember._id || selectedMember.id, updateData);
       setShowEditModal(false);
     } catch (error) {
+      toast.error('Failed to update member. Please try again.');
       console.error('Error updating member:', error);
-      alert('Failed to update member. Please try again.');
     }
   };
 
@@ -264,8 +264,8 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
         await handleDeleteMember(id);
         setSelectedMember(null);
       } catch (error) {
+        toast.error('Failed to delete member. Please try again.');
         console.error('Error deleting member:', error);
-        alert('Failed to delete member. Please try again.');
       }
     }
   };
@@ -292,8 +292,8 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
         });
       }
     } catch (error) {
+      toast.error('Failed to create loan. Please try again.');
       console.error('Error creating loan:', error);
-      alert('Failed to create loan. Please try again.');
     }
   };
 

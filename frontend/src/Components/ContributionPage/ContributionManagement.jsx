@@ -100,8 +100,8 @@ const ContributionManagement = () => {
         setSelectedContribution(null);
       }
     } catch (err) {
+      toast.error('Failed to update contribution');
       console.error('Error updating contribution:', err);
-      alert('Failed to update contribution');
     }
   };
 
@@ -121,21 +121,12 @@ const ContributionManagement = () => {
         setContributions(prev => prev.filter(c => c._id !== id));
         setSelectedContribution(null);
       } catch (err) {
+        toast.error('Failed to delete contribution');
         console.error('Error deleting contribution:', err);
-        alert('Failed to delete contribution');
       }
     }
   };
 
-  // Get contributions by member
-  const getMemberContributions = async (memberId) => {
-    try {
-      const response = await contributionAPI.getByMember(memberId);
-      setContributions(response.data || response);
-    } catch (err) {
-      console.error('Error loading member contributions:', err);
-    }
-  };
 
   // Filter and sort contributions
   const filterAndSortContributions = () => {

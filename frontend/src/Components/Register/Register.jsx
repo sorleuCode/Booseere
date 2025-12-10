@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authAPI } from '../../api/auth';
 import { useAuth } from '../../context/AuthContext';
+import { toast } from 'react-toastify';
 import './Register.css';
 
 function AdminRegister() {
@@ -32,12 +33,12 @@ function AdminRegister() {
 
     // Simple validation
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+      toast.error('Passwords do not match');
       return;
     }
 
     if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters');
+      toast.error('Password must be at least 6 characters');
       return;
     }
 
@@ -50,21 +51,23 @@ function AdminRegister() {
         email: formData.email,
         password: formData.password
       });
-      
+
       // Store the JWT token from backend
       // Use AuthContext to handle login
         login(response.data.user || { email: formData.email }, response.data.token);
-      navigate('/admin');
+      navigate('/login');
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed. Please try again.');
+      // Show toast notification for registration errors
+      toast.error(err.response?.data?.message || 'Registration failed. Please try again.');
+      console.error('Registration error:', err);
     } finally {
       setIsLoading(false);
     }
   };
+return (
+  <div className="admin-register-page">
 
-  return (
-    <div className="admin-register-page">
-      {/* Background Elements */}
+    {/* Background Elements */}
       <div className="register-background">
         <div className="bg-circle circle-1"></div>
         <div className="bg-circle circle-2"></div>
@@ -157,12 +160,6 @@ function AdminRegister() {
             />
           </div>
 
-          {/* Error Message */}
-          {error && (
-            <div className="error-box">
-              {error}
-            </div>
-          )}
 
           {/* Submit Button */}
           <button type="submit" className="register-button" disabled={isLoading}>

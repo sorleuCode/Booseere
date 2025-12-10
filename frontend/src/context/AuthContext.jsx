@@ -69,16 +69,26 @@ export const AuthProvider = ({ children }) => {
       return { success: false, message: response.message };
     } catch (error) {
       console.error('Login failed:', error);
+      // The error is already handled by the API layer with toast notifications
       return { success: false, message: error.response?.data?.message || 'Login failed' };
     }
   };
 
   // Logout function
-  const logout = () => {
-    setUser(null);
-    setIsAuthenticated(false);
-    localStorage.removeItem('adminToken');
-    localStorage.removeItem('adminUser');
+  const logout = async () => {
+    try {
+      // Call backend logout endpoint
+      await authAPI.logout();
+    } catch (error) {
+      console.error('Logout failed:', error);
+      // Even if backend logout fails, we should still clear client-side data
+    } finally {
+      // Clear client-side authentication state
+      setUser(null);
+      setIsAuthenticated(false);
+      localStorage.removeItem('adminToken');
+      localStorage.removeItem('adminUser');
+    }
   };
 
   // Update user data via API

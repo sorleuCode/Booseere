@@ -2,13 +2,14 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { toast } from 'react-toastify';
 import './login.css';
 
 function Login() {
   const navigate = useNavigate();
   const { login } = useAuth();
   const [formData, setFormData] = useState({
-    email: '', 
+    email: '',
     password: ''
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -20,13 +21,11 @@ function Login() {
       ...formData,
       [e.target.name]: e.target.value
     });
-    setError('');
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
 
     try {
       // Use Auth Context to handle login (it makes the API call internally)
@@ -34,11 +33,11 @@ function Login() {
 
       if (result.success) {
         navigate('/admin');
-      } else {
-        setError(result.message || 'Login failed. Please try again.');
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed. Please try again.');
+      // Show toast notification for login errors
+      toast.error(err.response?.data?.message || 'Login failed. Please try again.');
+      console.error('Login error:', err);
     } finally {
       setIsLoading(false);
     }
@@ -46,7 +45,7 @@ function Login() {
 
   return (
     <div className="simple-login-page">
-      
+
       {/* Background */}
       <div className="simple-bg">
         <div className="blob blob-1"></div>
@@ -110,11 +109,6 @@ function Login() {
             </div>
           </div>
 
-          {error && (
-            <div className="error-msg">
-              ⚠️ {error}
-            </div>
-          )}
 
           <button type="submit" className="login-btn" disabled={isLoading}>
             {isLoading ? (

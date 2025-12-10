@@ -1,6 +1,8 @@
 /* Base Container */
 .loading-spinner-container {
   display: flex;
+  justify-content: center;
+  align-items: center;
   padding: 2rem;
   width: 100%;
   min-height: 60px;
@@ -62,16 +64,25 @@
   border-top-color: #f59e0b;
 }
 
-/* Simple Spinner */
+/* Simple Spinner - Modern Design */
 .spinner {
   width: 40px;
   height: 40px;
-  border: 3px solid rgba(243, 244, 246, 0.2);
+  border: 3px solid #e5e7eb;
   border-top: 3px solid #4f9cf9;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   box-shadow: none;
   outline: none;
+}
+
+/* Dashboard-specific spinner style */
+.loading-spinner-container.dashboard .spinner {
+  border: 3px solid #e5e7eb;
+  border-top: 3px solid #4f9cf9;
+  border-right: 3px solid #4f9cf9;
+  border-bottom: 3px solid #e5e7eb;
+  border-left: 3px solid #e5e7eb;
 }
 
 .loading-spinner-container.small .spinner {

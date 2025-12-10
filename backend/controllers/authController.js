@@ -4,6 +4,7 @@ import User from '../models/User.js';
 import crypto from 'crypto';
 import generateToken from '../utils/generateToken.js';
 import { sendPasswordResetEmail } from '../services/emailService.js';
+import { createError, errors as errorTypes } from '../utils/errorResponse.js';
 
 // @desc    Register admin (only if no admin exists)
 // @route   POST /api/auth/register-admin
@@ -18,8 +19,7 @@ const registerAdmin = asyncHandler(async (req, res) => {
   // Check if admin already exists
   const existingAdmin = await User.findOne({ role: 'admin' });
   if (existingAdmin) {
-    res.status(400);
-    throw new Error('Admin already exists. Please login.');
+    throw errorTypes.conflict('Admin already exists. Please login.');
   }
 
   const { email, password, fullName } = req.body;
@@ -27,8 +27,7 @@ const registerAdmin = asyncHandler(async (req, res) => {
   // Check if user exists
   const userExists = await User.findOne({ email });
   if (userExists) {
-    res.status(400);
-    throw new Error('Admin with this email already exists');
+    throw errorTypes.conflict('Admin with this email already exists');
   }
 
   // Create admin user
@@ -71,8 +70,7 @@ const login = asyncHandler(async (req, res) => {
 
   if (user && (await user.matchPassword(password))) {
     if (!user.isActive) {
-      res.status(401);
-      throw new Error('Account is inactive. Contact system administrator.');
+      throw errorTypes.unauthorized('Account is inactive. Contact system administrator.');
     }
 
     res.json({
@@ -85,8 +83,7 @@ const login = asyncHandler(async (req, res) => {
       },
     });
   } else {
-    res.status(401);
-    throw new Error('Invalid email or password');
+    throw errorTypes.unauthorized('Invalid email or password');
   }
 });
 
@@ -135,8 +132,7 @@ const updateProfile = asyncHandler(async (req, res) => {
       },
     });
   } else {
-    res.status(404);
-    throw new Error('Admin not found');
+    throw errorTypes.notFound('Admin not found');
   }
 });
 
@@ -157,8 +153,7 @@ const changePassword = asyncHandler(async (req, res) => {
       message: 'Password changed successfully',
     });
   } else {
-    res.status(401);
-    throw new Error('Current password is incorrect');
+    throw errorTypes.unauthorized('Current password is incorrect');
   }
 });
 
@@ -170,8 +165,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
 
   const user = await User.findOne({ email, role: 'admin' });
   if (!user) {
-    res.status(404);
-    throw new Error('No admin found with this email');
+    throw errorTypes.notFound('No admin found with this email');
   }
 
   // Generate reset token
@@ -191,8 +185,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;
     await user.save();
-    res.status(500);
-    throw new Error('Email could not be sent');
+    throw errorTypes.serverError('Email could not be sent');
   }
 });
 
@@ -213,8 +206,7 @@ const resetPassword = asyncHandler(async (req, res) => {
   }).select('+password');
 
   if (!user) {
-    res.status(400);
-    throw new Error('Invalid or expired reset token');
+    throw errorTypes.badRequest('Invalid or expired reset token');
   }
 
   // Set new password
@@ -229,6 +221,20 @@ const resetPassword = asyncHandler(async (req, res) => {
   });
 });
 
+// @desc    Logout user
+// @route   POST /api/auth/logout
+// @access  Private/Admin
+const logout = asyncHandler(async (req, res) => {
+  // Clear the token from client side (handled by frontend)
+  // In a JWT system, logout is typically handled client-side by removing the token
+  // But we can provide an endpoint for consistency and potential future enhancements
+
+  res.json({
+    success: true,
+    message: 'Logout successful',
+  });
+});
+
 export {
   registerAdmin,
   login,
@@ -237,4 +243,5 @@ export {
   changePassword,
   forgotPassword,
   resetPassword,
+  logout,
 };

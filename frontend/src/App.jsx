@@ -1,4 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import "./App.css";
 import Homepage from "./Components/Homepage/Homepage";
@@ -25,8 +27,8 @@ import { DashboardProvider } from "./context/DashboardContext";
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <Routes>
+        <Router>
+          <Routes>
           {/* Public routes - no authentication required */}
           <Route path="/" element={<Homepage />} />
           <Route path="/about" element={<Aboutus />} />
@@ -70,6 +72,7 @@ function App() {
           } />
         </Routes>
       </Router>
+      <ToastContainer />
     </AuthProvider>
   );
 }

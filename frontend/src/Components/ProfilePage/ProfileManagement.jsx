@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { toast } from 'react-toastify';
 
 const ProfileManagement = () => {
   const { user, updateUser, changePassword, refreshUser } = useAuth();
@@ -34,10 +35,10 @@ const ProfileManagement = () => {
         setMessage('Profile updated successfully!');
         setIsEditing(false);
       } else {
-        setError(result.message);
+        toast.error(result.message);
       }
     } catch (err) {
-      setError('Failed to update profile');
+      toast.error('Failed to update profile');
     } finally {
       setLoading(false);
     }
@@ -50,13 +51,13 @@ const ProfileManagement = () => {
     setMessage('');
 
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      setError('New passwords do not match');
+      toast.error('New passwords do not match');
       setLoading(false);
       return;
     }
 
     if (passwordForm.newPassword.length < 6) {
-      setError('New password must be at least 6 characters');
+      toast.error('New password must be at least 6 characters');
       setLoading(false);
       return;
     }
@@ -75,10 +76,10 @@ const ProfileManagement = () => {
           confirmPassword: '',
         });
       } else {
-        setError(result.message);
+        toast.error(result.message);
       }
     } catch (err) {
-      setError('Failed to change password');
+      toast.error('Failed to change password');
     } finally {
       setLoading(false);
     }
@@ -98,7 +99,7 @@ const ProfileManagement = () => {
         });
       }
     } catch (err) {
-      setError('Failed to refresh profile');
+      toast.error('Failed to refresh profile');
     } finally {
       setLoading(false);
     }

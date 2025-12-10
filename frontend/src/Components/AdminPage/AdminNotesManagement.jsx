@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useDashboard } from '../../context/DashboardContext';
 import { useConfirm } from '../../hooks';
-import { formatDate, formatRelativeTime } from '../../utils/dateUtils';
+import { formatRelativeTime } from '../../utils/dateUtils';
 import ConfirmModal from '../UI/ConfirmModal';
 import './AdminNotesManagement.css';
 
