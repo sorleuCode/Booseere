@@ -55,7 +55,7 @@ function AdminRegister() {
       // Store the JWT token from backend
       // Use AuthContext to handle login
         login(response.data.user || { email: formData.email }, response.data.token);
-      navigate('/admin');
+      navigate('/login');
     } catch (err) {
       // Show toast notification for registration errors
       toast.error(err.response?.data?.message || 'Registration failed. Please try again.');
