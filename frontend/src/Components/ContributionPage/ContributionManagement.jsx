@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { contributionAPI } from '../../api/contributions';
 import { memberAPI } from '../../api/members';
 import { useConfirm } from '../../hooks';
 import LoadingSpinner from '../UI/LoadingSpinner';
 import ConfirmModal from '../UI/ConfirmModal';
+import ContributionDetailsModal from './ContributionDetailsModal';
+import './ContributionManagement.css';
 
 const ContributionManagement = () => {
   const navigate = useNavigate();
@@ -28,12 +30,21 @@ const ContributionManagement = () => {
 
   const [formData, setFormData] = useState({
     memberId: '',
+    memberLabel: '',
     amount: '',
     contributionType: 'monthly',
     paymentMethod: 'cash',
     paymentDate: new Date().toISOString().split('T')[0],
     notes: '',
   });
+  // Search state for member selector
+  const [memberSearch, setMemberSearch] = useState('');
+  const [showMemberDropdown, setShowMemberDropdown] = useState(false);
+  const [debouncedMemberSearch, setDebouncedMemberSearch] = useState(memberSearch);
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedMemberSearch(memberSearch), 250);
+    return () => clearTimeout(t);
+  }, [memberSearch]);
 
   // Load contributions
   const loadContributions = async () => {
@@ -51,19 +62,25 @@ const ContributionManagement = () => {
   };
 
   // Load members for dropdown
-  const loadMembers = async () => {
+  const loadMembers = useCallback(async () => {
     try {
       const response = await memberAPI.getAll();
       setMembers(response.data || response);
     } catch (err) {
       console.error('Error loading members:', err);
     }
-  };
+  }, []);
 
   // Add contribution
-  const addContribution = async (e) => {
+  const addContribution = useCallback(async (e) => {
     e.preventDefault();
     setSubmitting(true);
+    // pre-submit validation
+    if (!formData.memberId) {
+      alert('Please select a member for this contribution');
+      setSubmitting(false);
+      return;
+    }
     try {
       const response = await contributionAPI.add({
         ...formData,
@@ -74,6 +91,7 @@ const ContributionManagement = () => {
         setShowModal(false);
         setFormData({
           memberId: '',
+          memberLabel: '',
           amount: '',
           contributionType: 'monthly',
           paymentMethod: 'cash',
@@ -87,10 +105,10 @@ const ContributionManagement = () => {
     } finally {
       setSubmitting(false);
     }
-  };
+  }, [formData]);
 
   // Update contribution
-  const updateContribution = async (id, updateData) => {
+  const updateContribution = useCallback(async (id, updateData) => {
     try {
       const response = await contributionAPI.update(id, updateData);
       if (response.success) {
@@ -103,10 +121,11 @@ const ContributionManagement = () => {
       toast.error('Failed to update contribution');
       console.error('Error updating contribution:', err);
     }
-  };
+  }, []);
 
   // Delete contribution
-  const deleteContribution = async (id) => {
+  const deleteContribution = useCallback(async (id) => {
+    if (!id) return;
     const confirmed = await confirm({
       title: 'Delete Contribution',
       message: 'Are you sure you want to delete this contribution? This action cannot be undone.',
@@ -125,11 +144,11 @@ const ContributionManagement = () => {
         console.error('Error deleting contribution:', err);
       }
     }
-  };
+  }, [confirm]);
 
 
   // Filter and sort contributions
-  const filterAndSortContributions = () => {
+  const filterAndSortContributions = useCallback(() => {
     let filtered = [...contributions];
 
     // Search filter
@@ -191,16 +210,103 @@ const ContributionManagement = () => {
     });
 
     setFilteredContributions(filtered);
-  };
+  }, [searchTerm, statusFilter, typeFilter, memberFilter, sortBy, sortOrder, contributions]);
+
+  // Aggregate contributions by member for the aggregated view
+  const memberAggregates = React.useMemo(() => {
+    const map = new Map();
+    filteredContributions.forEach(c => {
+      const rawId = c.memberId?._id || c.memberId;
+      if (!rawId || rawId === 'undefined' || rawId === 'null') {
+        console.warn('Contribution entry with missing/invalid memberId:', c);
+        return; // skip entries with invalid memberId
+      }
+      const id = String(rawId);
+      const name = c.memberId?.fullName || 'Unknown';
+      if (!map.has(id)) {
+        map.set(id, { memberId: id, fullName: name, total: 0, lastPayment: null, count: 0 });
+      }
+      const entry = map.get(id);
+      entry.total += (c.amount || 0);
+      entry.count += 1;
+      const pd = new Date(c.paymentDate);
+      if (!entry.lastPayment || pd > new Date(entry.lastPayment)) entry.lastPayment = c.paymentDate;
+    });
+    return Array.from(map.values()).sort((a,b) => b.total - a.total);
+  }, [filteredContributions]);
 
   useEffect(() => {
     loadContributions();
     loadMembers();
-  }, []);
+  }, [loadMembers]);
 
   useEffect(() => {
     filterAndSortContributions();
-  }, [contributions, searchTerm, statusFilter, typeFilter, memberFilter, sortBy, sortOrder]);
+  }, [filterAndSortContributions]);
+
+  /* Render helpers */
+  const renderMemberAggregates = () => (
+    <div className="contribution-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Member</th>
+            <th>Total Contribution</th>
+            <th>Last Payment</th>
+            <th>Count</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {memberAggregates.map(entry => (
+            <tr key={entry.memberId}>
+              <td>{entry.fullName}</td>
+              <td>{formatCurrency(entry.total)}</td>
+              <td>{entry.lastPayment ? new Date(entry.lastPayment).toLocaleDateString() : 'N/A'}</td>
+              <td>{entry.count}</td>
+              <td>
+                <button
+                  onClick={async () => {
+                    try {
+                      const rawId = entry.memberId;
+                      if (!rawId || rawId === 'undefined' || rawId === 'null') {
+                        console.error('Invalid memberId for entry (skipping):', entry);
+                        setSelectedContribution({ member: { _id: null, fullName: entry.fullName }, contributions: [], total: entry.total });
+                        return;
+                      }
+
+                      const memberIdToUse = String(rawId);
+                      const resp = await contributionAPI.getByMember(encodeURIComponent(memberIdToUse));
+                      const data = resp.data || resp;
+                      const contributionsArr = data.data || data;
+                      // pick most recent contribution (by paymentDate) to open details directly
+                      if (Array.isArray(contributionsArr) && contributionsArr.length > 0) {
+                        const sorted = contributionsArr.slice().sort((a,b) => new Date(b.paymentDate) - new Date(a.paymentDate));
+                        setSelectedContribution(sorted[0]);
+                      } else if (contributionsArr && contributionsArr._id) {
+                        setSelectedContribution(contributionsArr);
+                      } else {
+                        setSelectedContribution(null);
+                      }
+                      setShowModal(false);
+                    } catch (err) {
+                      console.error('Failed to load member contributions:', err);
+                        // no contributions found for this member
+                        setSelectedContribution(null);
+                        setShowModal(false);
+                    }
+                  }}
+                  className="btn-view"
+                >
+                  View
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
 
   const formatCurrency = (amount) => {
     return `₦${amount?.toLocaleString() || 0}`;
@@ -239,7 +345,7 @@ const ContributionManagement = () => {
           <h2>Contribution Management</h2>
         </div>
         <div className="header-actions">
-          <button onClick={() => setShowModal(true)} className="btn-add">
+          <button onClick={() => { setSelectedContribution(null); setShowModal(true); setMemberSearch(''); setFormData({ memberId: '', memberLabel: '', amount: '', contributionType: 'monthly', paymentMethod: 'cash', paymentDate: new Date().toISOString().split('T')[0], notes: '' }); }} className="btn-add">
             Add Contribution
           </button>
           <button onClick={loadContributions} className="btn-refresh">
@@ -356,208 +462,119 @@ const ContributionManagement = () => {
         </div>
       </div>
 
-      <div className="contribution-table">
-        <table>
-          <thead>
-            <tr>
-              <th>Receipt No.</th>
-              <th>Member</th>
-              <th>Amount</th>
-              <th>Type</th>
-              <th>Payment Method</th>
-              <th>Payment Date</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredContributions.map(contribution => (
-              <tr key={contribution._id}>
-                <td>{contribution.receiptNumber || 'N/A'}</td>
-                <td>{contribution.memberId?.fullName || 'N/A'}</td>
-                <td>{formatCurrency(contribution.amount)}</td>
-                <td>
-                  <span className={`type-pill ${getTypeColor(contribution.contributionType)}`}>
-                    {contribution.contributionType}
-                  </span>
-                </td>
-                <td>{contribution.paymentMethod}</td>
-                <td>{new Date(contribution.paymentDate).toLocaleDateString()}</td>
-                <td>
-                  <span className={`status-pill ${getStatusColor(contribution.status)}`}>
-                    {contribution.status}
-                  </span>
-                </td>
-                <td>
-                  <button 
-                    onClick={() => setSelectedContribution(contribution)}
-                    className="btn-view"
-                  >
-                    View
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {renderMemberAggregates()}
 
-      {/* Add Contribution Modal */}
+      {selectedContribution && (
+        <ContributionDetailsModal
+          contribution={selectedContribution}
+          onClose={() => setSelectedContribution(null)}
+          onDelete={deleteContribution}
+          onUpdate={updateContribution}
+        />
+      )}
+
       {showModal && (
         <div className="modal-backdrop" onClick={() => setShowModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h3>Add Contribution</h3>
-            <form onSubmit={addContribution}>
-              <div className="form-group">
-                <label>Member:</label>
-                <select 
-                  name="memberId"
-                  value={formData.memberId}
-                  onChange={(e) => setFormData({...formData, memberId: e.target.value})}
-                  required
-                >
-                  <option value="">Select Member</option>
-                  {members.map(member => (
-                    <option key={member._id} value={member._id}>
-                      {member.fullName}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              
-              <div className="form-group">
-                <label>Amount:</label>
-                <input 
-                  type="number" 
-                  name="amount"
-                  value={formData.amount}
-                  onChange={(e) => setFormData({...formData, amount: e.target.value})}
-                  required 
-                />
-              </div>
-              
-              <div className="form-group">
-                <label>Contribution Type:</label>
-                <select 
-                  name="contributionType"
-                  value={formData.contributionType}
-                  onChange={(e) => setFormData({...formData, contributionType: e.target.value})}
-                >
-                  <option value="monthly">Monthly</option>
-                  <option value="special">Special</option>
-                  <option value="registration">Registration</option>
-                  <option value="fine">Fine</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
-              
-              <div className="form-group">
-                <label>Payment Method:</label>
-                <select 
-                  name="paymentMethod"
-                  value={formData.paymentMethod}
-                  onChange={(e) => setFormData({...formData, paymentMethod: e.target.value})}
-                >
-                  <option value="cash">Cash</option>
-                  <option value="bank_transfer">Bank Transfer</option>
-                  <option value="mobile_money">Mobile Money</option>
-                </select>
-              </div>
-              
-              <div className="form-group">
-                <label>Payment Date:</label>
-                <input 
-                  type="date" 
-                  name="paymentDate"
-                  value={formData.paymentDate}
-                  onChange={(e) => setFormData({...formData, paymentDate: e.target.value})}
-                  required 
-                />
-              </div>
-              
-              <div className="form-group">
-                <label>Notes:</label>
-                <textarea 
-                  name="notes"
-                  value={formData.notes}
-                  onChange={(e) => setFormData({...formData, notes: e.target.value})}
-                  rows="3"
-                />
-              </div>
-              
-              <div className="modal-buttons">
-                <button type="submit" className="btn-primary" disabled={submitting}>
-                  {submitting ? 'Adding...' : 'Add Contribution'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowModal(false)}
-                  className="btn-secondary"
-                  disabled={submitting}
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
+            <div className="modal-header">
+              <h2 className="modal-title">Add Contribution</h2>
+              <button type="button" className="modal-close-btn" onClick={() => setShowModal(false)}>×</button>
+            </div>
+
+            <div className="modal-body">
+              <form onSubmit={addContribution}>
+                <div className="form-group" style={{position: 'relative'}}>
+                  <label>Member</label>
+                  <input
+                    type="text"
+                    placeholder="Search member by name..."
+                    value={memberSearch}
+                    onChange={(e) => {
+                      setMemberSearch(e.target.value);
+                      setShowMemberDropdown(true);
+                    }}
+                    onFocus={() => setShowMemberDropdown(true)}
+                    required
+                  />
+                  {showMemberDropdown && (
+                    <div className="member-dropdown" style={{position: 'absolute', zIndex: 30, background: 'white', border: '1px solid #e2e8f0', width: '100%', maxHeight: 220, overflowY: 'auto'}}>
+                      {members.filter(m => m.fullName?.toLowerCase().includes((debouncedMemberSearch || '').toLowerCase())).map(m => (
+                        <div key={m._id} style={{padding: 8, cursor: 'pointer'}} onMouseDown={(ev) => {
+                          ev.preventDefault();
+                          setFormData(prev => ({...prev, memberId: m._id, memberLabel: m.fullName}));
+                          setMemberSearch(m.fullName);
+                          setShowMemberDropdown(false);
+                        }}>{m.fullName} <span style={{color: '#64748b'}}>({m.membershipNumber || ''})</span></div>
+                      ))}
+                      {members.filter(m => m.fullName?.toLowerCase().includes((debouncedMemberSearch || '').toLowerCase())).length === 0 && (
+                        <div style={{padding: 8, color: '#94a3b8'}}>No members found</div>
+                      )}
+                    </div>
+                  )}
+                </div>
+                <div className="form-group">
+                  <label>Amount (₦)</label>
+                  <input type="number" name="amount" min="0" step="0.01" value={formData.amount} onChange={(e) => setFormData(prev => ({...prev, amount: e.target.value}))} required />
+                </div>
+                <div className="form-group">
+                  <label>Type</label>
+                  <select value={formData.contributionType} onChange={(e) => setFormData(prev => ({...prev, contributionType: e.target.value}))}>
+                    <option value="monthly">Monthly</option>
+                    <option value="special">Special</option>
+                    <option value="registration">Registration</option>
+                    <option value="fine">Fine</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Payment Method</label>
+                  <select value={formData.paymentMethod} onChange={(e) => setFormData(prev => ({...prev, paymentMethod: e.target.value}))}>
+                    <option value="cash">Cash</option>
+                    <option value="bank_transfer">Bank Transfer</option>
+                    <option value="mobile_money">Mobile Money</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Payment Date:</label>
+                  <input 
+                    type="date" 
+                    name="paymentDate"
+                    value={formData.paymentDate}
+                    onChange={(e) => setFormData(prev => ({...prev, paymentDate: e.target.value}))}
+                    required 
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label>Notes:</label>
+                  <textarea 
+                    name="notes"
+                    value={formData.notes}
+                    onChange={(e) => setFormData(prev => ({...prev, notes: e.target.value}))}
+                    rows="3"
+                  />
+                </div>
+                
+                <div className="modal-footer">
+                  <button type="submit" className="btn-primary" disabled={submitting}>
+                    {submitting ? 'Adding...' : 'Add Contribution'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowModal(false)}
+                    className="btn-secondary"
+                    disabled={submitting}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}
 
-      {/* Contribution Details Modal */}
-      {selectedContribution && (
-        <div className="modal-backdrop" onClick={() => setSelectedContribution(null)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h3>Contribution Details</h3>
-            <div className="contribution-details">
-              <p><strong>Receipt Number:</strong> {selectedContribution.receiptNumber || 'N/A'}</p>
-              <p><strong>Member:</strong> {selectedContribution.memberId?.fullName}</p>
-              <p><strong>Amount:</strong> {formatCurrency(selectedContribution.amount)}</p>
-              <p><strong>Type:</strong> {selectedContribution.contributionType}</p>
-              <p><strong>Payment Method:</strong> {selectedContribution.paymentMethod}</p>
-              <p><strong>Payment Date:</strong> {new Date(selectedContribution.paymentDate).toLocaleDateString()}</p>
-              <p><strong>Status:</strong> 
-                <span className={`status-pill ${getStatusColor(selectedContribution.status)}`}>
-                  {selectedContribution.status}
-                </span>
-              </p>
-              <p><strong>Notes:</strong> {selectedContribution.notes || 'None'}</p>
-            </div>
-
-            <div className="contribution-actions">
-              {selectedContribution.status === 'pending' && (
-                <>
-                  <button 
-                    onClick={() => updateContribution(selectedContribution._id, { status: 'verified' })}
-                    className="btn-verify"
-                  >
-                    Verify
-                  </button>
-                  <button 
-                    onClick={() => updateContribution(selectedContribution._id, { status: 'rejected' })}
-                    className="btn-reject"
-                  >
-                    Reject
-                  </button>
-                </>
-              )}
-              
-              <button 
-                onClick={() => deleteContribution(selectedContribution._id)}
-                className="btn-delete"
-              >
-                Delete
-              </button>
-            </div>
-
-            <button 
-              onClick={() => setSelectedContribution(null)}
-              className="btn-close"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
+      
 
       {/* Confirm Modal */}
       <ConfirmModal
@@ -571,461 +588,7 @@ const ContributionManagement = () => {
         onCancel={confirmState.onCancel}
       />
 
-      <style jsx>{`
-        .contribution-management {
-          padding: 20px;
-        }
-
-        .filters-section {
-          background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.8));
-          padding: 24px;
-          border-radius: 20px;
-          box-shadow: 
-            0 4px 20px rgba(0, 0, 0, 0.08),
-            0 1px 3px rgba(0, 0, 0, 0.1),
-            inset 0 1px 0 rgba(255, 255, 255, 0.6);
-          backdrop-filter: blur(10px);
-          border: 1px solid rgba(226, 232, 240, 0.8);
-          margin-bottom: 24px;
-          position: relative;
-        }
-
-        .filters-section::before {
-          content: '💰 Filter & Search Contributions';
-          display: block;
-          text-align: center;
-          font-size: 0.95rem;
-          color: #059669;
-          margin-bottom: 20px;
-          font-weight: 600;
-          opacity: 0.9;
-        }
-
-        .search-box {
-          margin-bottom: 20px;
-        }
-
-        .contribution-search-wrapper {
-          position: relative;
-          width: 100%;
-        }
-
-        .contribution-search-wrapper::before {
-          content: '💳';
-          position: absolute;
-          right: 16px;
-          top: 50%;
-          transform: translateY(-50%);
-          font-size: 18px;
-          z-index: 2;
-          color: #94a3b8;
-          transition: all 0.3s ease;
-          pointer-events: none;
-        }
-
-        .contribution-search-wrapper:focus-within::before {
-          color: #059669;
-          transform: translateY(-50%) scale(1.1);
-        }
-
-        .contribution-search-input {
-          width: 100%;
-          padding: 16px 48px 16px 20px;
-          border: 2px solid #e2e8f0;
-          border-radius: 16px;
-          font-size: 16px;
-          background: #ffffff;
-          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-          font-weight: 500;
-        }
-
-        .contribution-search-input:focus {
-          outline: none;
-          border-color: #059669;
-          box-shadow: 
-            0 4px 20px rgba(5, 150, 105, 0.15),
-            0 0 0 4px rgba(5, 150, 105, 0.1);
-          transform: translateY(-2px);
-          background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-        }
-
-        .contribution-search-input::placeholder {
-          color: #94a3b8;
-          font-weight: 400;
-        }
-
-        .filter-controls {
-          display: flex;
-          gap: 16px;
-          align-items: center;
-          flex-wrap: wrap;
-        }
-
-        .filter-wrapper {
-          position: relative;
-          min-width: 140px;
-        }
-
-        .filter-wrapper::before {
-          content: '';
-          position: absolute;
-          left: 16px;
-          top: 50%;
-          transform: translateY(-50%);
-          font-size: 16px;
-          z-index: 1;
-          color: #94a3b8;
-          transition: all 0.3s ease;
-          pointer-events: none;
-        }
-
-        .filter-wrapper:nth-child(1)::before { content: '✅'; }
-        .filter-wrapper:nth-child(2)::before { content: '📋'; }
-        .filter-wrapper:nth-child(3)::before { content: '👤'; }
-        .filter-wrapper:nth-child(4)::before { content: '📅'; }
-
-        .filter-wrapper:focus-within::before {
-          color: #059669;
-          transform: translateY(-50%) scale(1.1);
-        }
-
-        .contribution-filter-select {
-          width: 100%;
-          padding: 12px 16px 12px 44px;
-          border: 2px solid #e2e8f0;
-          border-radius: 12px;
-          font-size: 14px;
-          background: #ffffff;
-          cursor: pointer;
-          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-          appearance: none;
-          -webkit-appearance: none;
-          -moz-appearance: none;
-          background-image: url("data:image/svg+xml;charset=US-ASCII,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6,9 12,15 18,9'></polyline></svg>");
-          background-repeat: no-repeat;
-          background-position: right 12px center;
-          background-size: 14px;
-          font-weight: 600;
-        }
-
-        .contribution-filter-select:hover {
-          border-color: #10b981;
-          box-shadow: 0 4px 15px rgba(16, 185, 129, 0.15);
-          transform: translateY(-1px);
-        }
-
-        .contribution-filter-select:focus {
-          outline: none;
-          border-color: #059669;
-          box-shadow: 
-            0 4px 20px rgba(5, 150, 105, 0.15),
-            0 0 0 4px rgba(5, 150, 105, 0.1);
-        }
-
-        .contribution-sort-toggle {
-          padding: 12px 16px;
-          background: linear-gradient(135deg, #059669, #10b981);
-          border: none;
-          border-radius: 12px;
-          cursor: pointer;
-          font-size: 16px;
-          font-weight: 700;
-          color: white;
-          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-          box-shadow: 0 4px 15px rgba(5, 150, 105, 0.3);
-          min-width: 50px;
-          height: 48px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        .contribution-sort-toggle:hover {
-          background: linear-gradient(135deg, #047857, #059669);
-          transform: translateY(-2px);
-          box-shadow: 0 6px 20px rgba(5, 150, 105, 0.4);
-        }
-
-        .contribution-sort-toggle:active {
-          transform: translateY(0);
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-          .contribution-management {
-            padding: 16px;
-          }
-
-          .contribution-header {
-            flex-direction: column;
-            gap: 16px;
-            align-items: stretch;
-          }
-
-          .header-left {
-            text-align: center;
-          }
-
-          .header-actions {
-            justify-content: center;
-            flex-wrap: wrap;
-          }
-
-          .filters-section {
-            padding: 20px;
-            margin-bottom: 20px;
-          }
-
-          .filters-section::before {
-            font-size: 0.9rem;
-            margin-bottom: 16px;
-          }
-
-          .filter-controls {
-            flex-direction: column;
-            align-items: stretch;
-            gap: 12px;
-          }
-
-          .filter-wrapper,
-          .contribution-search-wrapper {
-            min-width: auto;
-            width: 100%;
-          }
-
-          .contribution-search-input,
-          .contribution-filter-select {
-            width: 100%;
-            min-width: auto;
-          }
-
-          .contribution-stats {
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 12px;
-          }
-
-          .stat-card h3 {
-            font-size: 1.5em;
-          }
-
-          .contribution-table {
-            overflow-x: auto;
-          }
-
-          th, td {
-            padding: 8px 6px;
-            font-size: 14px;
-          }
-
-          .modal-content {
-            margin: 16px;
-            padding: 20px;
-            width: calc(100% - 32px);
-            max-width: none;
-          }
-        }
-
-        @media (max-width: 480px) {
-          .contribution-management {
-            padding: 12px;
-          }
-
-          .filters-section {
-            padding: 12px;
-          }
-
-          .contribution-stats {
-            grid-template-columns: 1fr;
-          }
-
-          .stat-card {
-            padding: 16px;
-            text-align: center;
-          }
-
-          .stat-card h3 {
-            font-size: 1.8em;
-          }
-
-          th, td {
-            padding: 6px 4px;
-            font-size: 12px;
-          }
-
-          .btn-back, .btn-add, .btn-refresh {
-            padding: 6px 10px;
-            font-size: 12px;
-          }
-        }
-        .contribution-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 20px;
-        }
-        .header-left {
-          display: flex;
-          align-items: center;
-          gap: 15px;
-        }
-        .btn-back {
-          background: #6b7280;
-          color: white;
-          border: none;
-          padding: 8px 12px;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 14px;
-        }
-        .btn-back:hover {
-          background: #4b5563;
-        }
-        .header-actions {
-          display: flex;
-          gap: 10px;
-          align-items: center;
-        }
-        .filter-select {
-          padding: 8px 12px;
-          border: 1px solid #d1d5db;
-          border-radius: 4px;
-        }
-        .contribution-stats {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-          gap: 20px;
-          margin-bottom: 30px;
-        }
-        .stat-card {
-          background: white;
-          padding: 20px;
-          border-radius: 8px;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-          text-align: center;
-        }
-        .stat-card h3 {
-          font-size: 2em;
-          margin: 0;
-          color: #2563eb;
-        }
-        .contribution-table {
-          background: white;
-          border-radius: 8px;
-          overflow: hidden;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-          overflow-x: auto;
-        }
-        table {
-          width: 100%;
-          border-collapse: collapse;
-          min-width: 800px;
-        }
-        th, td {
-          padding: 12px;
-          text-align: left;
-          border-bottom: 1px solid #e5e7eb;
-        }
-        th {
-          background: #f9fafb;
-          font-weight: 600;
-        }
-        .status-pill, .type-pill {
-          padding: 4px 8px;
-          border-radius: 4px;
-          font-size: 0.875em;
-          font-weight: 500;
-        }
-        .modal-backdrop {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: rgba(0,0,0,0.5);
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          z-index: 1000;
-        }
-        .modal-content {
-          background: white;
-          padding: 30px;
-          border-radius: 8px;
-          max-width: 500px;
-          width: 90%;
-          max-height: 80vh;
-          overflow-y: auto;
-        }
-        .form-group {
-          margin-bottom: 15px;
-        }
-        .form-group label {
-          display: block;
-          margin-bottom: 5px;
-          font-weight: 500;
-        }
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-          width: 100%;
-          padding: 8px 12px;
-          border: 1px solid #d1d5db;
-          border-radius: 4px;
-        }
-        .contribution-details {
-          margin: 20px 0;
-        }
-        .contribution-details p {
-          margin: 10px 0;
-        }
-        .contribution-actions {
-          display: flex;
-          gap: 10px;
-          margin: 20px 0;
-        }
-        .modal-buttons {
-          display: flex;
-          gap: 10px;
-          margin-top: 20px;
-        }
-        button {
-          padding: 8px 16px;
-          border: none;
-          border-radius: 4px;
-          cursor: pointer;
-          font-weight: 500;
-        }
-        .btn-primary {
-          background: #2563eb;
-          color: white;
-        }
-        .btn-secondary {
-          background: #6b7280;
-          color: white;
-        }
-        .btn-add {
-          background: #10b981;
-          color: white;
-        }
-        .btn-refresh {
-          background: #3b82f6;
-          color: white;
-        }
-        .btn-verify {
-          background: #10b981;
-          color: white;
-        }
-        .btn-reject {
-          background: #ef4444;
-          color: white;
-        }
-        .btn-delete {
-          background: #dc2626;
-          color: white;
-        }
-      `}</style>
+      
     </div>
   );
 };

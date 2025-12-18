@@ -42,6 +42,37 @@ const memberSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  // Additional registration/profile fields
+  age: {
+    type: Number,
+    required: false,
+  },
+  maritalStatus: {
+    type: String,
+    enum: ['single', 'married', 'divorced', 'widowed', 'other'],
+    required: false,
+  },
+  sex: {
+    type: String,
+    enum: ['male', 'female', 'other'],
+    required: false,
+  },
+  stateOfOrigin: {
+    type: String,
+    required: false,
+  },
+  localGovernment: {
+    type: String,
+    required: false,
+  },
+  occupation: {
+    type: String,
+    required: false,
+  },
+  guarantorName: {
+    type: String,
+    required: false,
+  },
   totalLoans: {
     type: Number,
     default: 0,

@@ -411,6 +411,10 @@ const LoanManagement = () => {
                     <span className="detail-value">{new Date(selectedLoan.applicationDate).toLocaleDateString()}</span>
                   </div>
                 </div>
+                {/* Small guidance note when loan is active / outstanding */}
+                {( ['disbursed','repaying','ongoing'].includes(selectedLoan.status) || (selectedLoan.outstandingBalance && selectedLoan.outstandingBalance > 0) ) && (
+                  <div className="loan-note">💡 Note: If the member is unlikely to pay in full immediately, consider saving partial payments (drafts) or recording scheduled repayments.</div>
+                )}
               </div>
 
               <div className="action-section">
@@ -1097,6 +1101,16 @@ const LoanManagement = () => {
           color: #1f2937;
           font-size: 18px;
           font-weight: 600;
+        }
+
+        .loan-note {
+          margin-top: 12px;
+          padding: 10px 12px;
+          background: #fffbeb;
+          border-left: 4px solid #f59e0b;
+          color: #92400e;
+          border-radius: 6px;
+          font-size: 0.95rem;
         }
 
         .repayments-list {
