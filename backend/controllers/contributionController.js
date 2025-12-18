@@ -1,6 +1,7 @@
 import asyncHandler from 'express-async-handler';
 import Contribution from '../models/Contribution.js';
 import Member from '../models/Member.js';
+import mongoose from 'mongoose';
 
 // @desc    Get all contributions
 // @route   GET /api/contributions
@@ -36,6 +37,12 @@ const getContributions = asyncHandler(async (req, res) => {
 // @route   GET /api/contributions/:id
 // @access  Private
 const getContribution = asyncHandler(async (req, res) => {
+  if (!req.params.id || req.params.id === 'undefined' || req.params.id === 'null') {
+    console.error('getContribution: invalid id param:', req.params.id);
+    res.status(400);
+    throw new Error('Invalid contribution id');
+  }
+
   const contribution = await Contribution.findById(req.params.id)
     .populate('memberId', 'fullName membershipNumber phone')
     .populate('recordedBy', 'username email');
@@ -144,6 +151,12 @@ const createContribution = asyncHandler(async (req, res) => {
 // @route   PUT /api/contributions/:id
 // @access  Private/Admin
 const updateContribution = asyncHandler(async (req, res) => {
+  if (!req.params.id || req.params.id === 'undefined' || req.params.id === 'null') {
+    console.error('updateContribution: invalid id param:', req.params.id);
+    res.status(400);
+    throw new Error('Invalid contribution id');
+  }
+
   let contribution = await Contribution.findById(req.params.id);
 
   if (!contribution) {
@@ -177,6 +190,12 @@ const updateContribution = asyncHandler(async (req, res) => {
 // @route   DELETE /api/contributions/:id
 // @access  Private/Admin
 const deleteContribution = asyncHandler(async (req, res) => {
+  if (!req.params.id || req.params.id === 'undefined' || req.params.id === 'null') {
+    console.error('deleteContribution: invalid id param:', req.params.id);
+    res.status(400);
+    throw new Error('Invalid contribution id');
+  }
+
   const contribution = await Contribution.findById(req.params.id);
 
   if (!contribution) {
@@ -201,7 +220,54 @@ const deleteContribution = asyncHandler(async (req, res) => {
 // @route   GET /api/contributions/member/:memberId
 // @access  Private
 const getMemberContributions = asyncHandler(async (req, res) => {
-  const contributions = await Contribution.find({ memberId: req.params.memberId })
+  // Accept either an ObjectId or a membershipNumber/phone; resolve to ObjectId
+  let memberId;
+  const incoming = req.params.memberId;
+  if (!incoming || incoming === 'undefined') {
+    res.status(400);
+    throw new Error('Invalid memberId');
+  }
+  // Prefer explicit validation first
+  try {
+    const valid = mongoose.isValidObjectId(incoming);
+    if (valid) {
+      memberId = new mongoose.Types.ObjectId(incoming);
+    } else {
+      // Not a valid ObjectId string — try to resolve by membershipNumber, phone, or parse JSON
+      let member = null;
+      // If incoming looks like JSON, try to parse it
+      try {
+        const parsed = JSON.parse(incoming);
+        if (parsed && (parsed._id || parsed.membershipNumber || parsed.phone)) {
+          if (parsed._id && mongoose.isValidObjectId(parsed._id)) {
+            memberId = new mongoose.Types.ObjectId(parsed._id);
+          }
+          if (!memberId && parsed.membershipNumber) member = await Member.findOne({ membershipNumber: parsed.membershipNumber });
+          if (!memberId && !member && parsed.phone) member = await Member.findOne({ phone: parsed.phone });
+        }
+      } catch (parseErr) {
+        // not JSON, ignore
+      }
+
+      if (!memberId) {
+        // Try direct lookup by membershipNumber or phone
+        member = member || await Member.findOne({ $or: [ { membershipNumber: incoming }, { phone: incoming } ] });
+        if (!member && !memberId) {
+          console.error('getMemberContributions: unable to resolve incoming member identifier:', incoming);
+          res.status(400);
+          throw new Error('Invalid memberId');
+        }
+        if (member) memberId = member._id;
+      }
+    }
+  } catch (err) {
+    console.error('getMemberContributions: error while resolving memberId:', err);
+    res.status(400);
+    throw new Error('Invalid memberId');
+  }
+  
+
+  const contributions = await Contribution.find({ memberId })
     .populate('recordedBy', 'username')
     .sort({ paymentDate: -1 });
 

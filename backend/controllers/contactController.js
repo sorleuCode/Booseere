@@ -23,16 +23,14 @@ const submitContactForm = asyncHandler(async (req, res) => {
   if (process.env.ENABLE_EMAILS !== 'false') {
     setImmediate(async () => {
       try {
-        console.log('Sending contact notification email to admin...');
-        const emailResult = await sendContactNotificationEmail(contact);
-        console.log('Contact notification email sent successfully:', emailResult);
+        await sendContactNotificationEmail(contact);
       } catch (emailError) {
         console.error('Failed to send contact notification email (async):', emailError);
         // Email failure doesn't affect contact form submission
       }
     });
   } else {
-    console.log('Email sending disabled via ENABLE_EMAILS=false');
+    // Email sending disabled via ENABLE_EMAILS=false
   }
 
   res.status(201).json({

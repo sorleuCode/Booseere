@@ -2,6 +2,7 @@ import asyncHandler from 'express-async-handler';
 import Member from '../models/Member.js';
 import Contribution from '../models/Contribution.js';
 import Loan from '../models/Loan.js';
+import mongoose from 'mongoose';
 
 // @desc    Get all members (Admin only)
 // @route   GET /api/members
@@ -27,8 +28,29 @@ const getMembers = asyncHandler(async (req, res) => {
     ];
   }
 
-  const members = await Member.find(query)
-    .sort({ createdAt: -1 });
+  // Use aggregation to include up-to-date contribution totals per member
+  const members = await Member.aggregate([
+    { $match: query },
+    {
+      $lookup: {
+        from: 'contributions',
+        localField: '_id',
+        foreignField: 'memberId',
+        as: 'contributions'
+      }
+    },
+    {
+      $addFields: {
+        totalContributions: { $sum: '$contributions.amount' }
+      }
+    },
+    {
+      $project: {
+        contributions: 0 // don't include full contributions array in listing
+      }
+    },
+    { $sort: { createdAt: -1 } }
+  ]);
 
   res.json({
     success: true,
@@ -78,6 +100,16 @@ const createMember = asyncHandler(async (req, res) => {
       address,
       position,
       profileImage,
+    } = req.body;
+    // Additional optional registration fields
+    const {
+      age,
+      maritalStatus,
+      sex,
+      stateOfOrigin,
+      localGovernment,
+      occupation,
+      guarantorName,
     } = req.body;
 
     // Validate required fields
@@ -148,86 +180,18 @@ const createMember = asyncHandler(async (req, res) => {
       membershipNumber,
       profileImage: profileImage || '',
       status: 'active',
+      age,
+      maritalStatus,
+      sex,
+      stateOfOrigin,
+      localGovernment,
+      occupation,
+      guarantorName,
       joinDate: new Date(),
     });
 
-    // Check if initial contribution amount was provided
-    if (req.body.totalContributions && req.body.totalContributions > 0) {
-      // Generate unique receipt number for the initial contribution using the same logic as createContribution
-      let receiptNumber;
-      let retryCount = 0;
-      const maxRetries = 5;
-  
-      while (retryCount < maxRetries) {
-        try {
-          // Get the current year and find the highest receipt number for this year
-          const currentYear = new Date().getFullYear();
-          const lastContribution = await Contribution.findOne(
-            { receiptNumber: { $regex: `^RCP${currentYear}` } },
-            { receiptNumber: 1 },
-            { sort: { receiptNumber: -1 } }
-          );
-  
-          let nextNumber = 1;
-          if (lastContribution && lastContribution.receiptNumber) {
-            const lastNumber = parseInt(lastContribution.receiptNumber.slice(9));
-            nextNumber = lastNumber + 1;
-          }
-  
-          receiptNumber = `RCP${currentYear}${String(nextNumber).padStart(5, '0')}`;
-  
-          // Try to create the contribution to check for duplicates
-          const testContribution = new Contribution({
-            receiptNumber,
-            memberId: member._id,
-            amount: req.body.totalContributions,
-            contributionType: 'registration',
-            paymentMethod: 'cash',
-            paymentDate: new Date(),
-            notes: 'Initial contribution upon member registration',
-            recordedBy: req.user._id,
-            status: 'verified',
-          });
-  
-          await testContribution.validate();
-          break; // Success, exit the retry loop
-        } catch (error) {
-          if (error.code === 11000 && error.keyPattern && error.keyPattern.receiptNumber) {
-            // Duplicate key error, retry with next number
-            retryCount++;
-            if (retryCount >= maxRetries) {
-              console.error('Unable to generate unique receipt number for initial contribution after multiple attempts');
-              // Don't throw error here, just skip the initial contribution
-              break;
-            }
-            continue;
-          } else {
-            // Other validation errors
-            throw error;
-          }
-        }
-      }
-  
-      // Only create the contribution if we have a valid receipt number
-      if (receiptNumber) {
-        // Create initial contribution record
-        const contribution = await Contribution.create({
-          memberId: member._id,
-          amount: req.body.totalContributions,
-          contributionType: 'registration', // Initial contribution is typically a registration fee
-          paymentMethod: 'cash', // Default payment method
-          paymentDate: new Date(),
-          receiptNumber,
-          notes: 'Initial contribution upon member registration',
-          recordedBy: req.user._id,
-          status: 'verified',
-        });
-
-      // Update member's total contributions
-      member.totalContributions = req.body.totalContributions;
-      await member.save();
-    }
-  }
+    // Initial contributions are no longer created automatically during registration.
+    // Contributions should be created via the Contributions API so totals remain consistent.
 
     res.status(201).json({
       success: true,
@@ -260,18 +224,23 @@ const updateMember = asyncHandler(async (req, res) => {
       throw new Error('Member not found');
     }
 
-    // Update member (profileImage comes from frontend Cloudinary upload)
+    // Update member fields directly. Contribution totals should be managed via the contributions API.
     const updateData = { ...req.body };
 
-    const updatedMember = await Member.findByIdAndUpdate(
+    // Prevent direct modification of totalContributions via member update
+    if (updateData.totalContributions !== undefined) delete updateData.totalContributions;
+
+    await Member.findByIdAndUpdate(
       req.params.id,
       updateData,
       { new: true, runValidators: true }
     );
 
+    const freshMember = await Member.findById(req.params.id);
+
     res.json({
       success: true,
-      data: updatedMember,
+      data: freshMember,
     });
   } catch (error) {
     console.error('Error in updateMember:', error);
@@ -359,9 +328,10 @@ const getMemberStatsById = asyncHandler(async (req, res) => {
     throw new Error('Member not found');
   }
 
-  // Get member's total contributions
+  // Get member's total contributions (ensure memberId is ObjectId for aggregation match)
+  const objMemberId = new mongoose.Types.ObjectId(memberId);
   const contributions = await Contribution.aggregate([
-    { $match: { memberId, status: 'verified' } },
+    { $match: { memberId: objMemberId, status: 'verified' } },
     { $group: { _id: null, total: { $sum: '$amount' }, count: { $sum: 1 } } }
   ]);
 

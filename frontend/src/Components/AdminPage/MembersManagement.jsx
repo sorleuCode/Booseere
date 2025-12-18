@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useMembers } from '../../context/MembersContext';
+import { memberAPI } from '../../api/members';
 import { useConfirm } from '../../hooks';
 import { uploadToCloudinary } from '../../services/cloudinaryService';
 import { loanAPI } from '../../api/loans';
@@ -29,7 +30,14 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
     fullName: '',
     phone: '',
     address: '',
-    totalContributions: 0,
+    // totalContributions removed — contributions must be added via Contributions page
+    age: undefined,
+    maritalStatus: '',
+    sex: '',
+    stateOfOrigin: '',
+    localGovernment: '',
+    occupation: '',
+    guarantorName: '',
     photo: null,
     photoPreview: null
   });
@@ -208,9 +216,15 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
         fullName: newMember.fullName,
         phone: newMember.phone,
         address: newMember.address,
-        totalContributions: newMember.totalContributions || 0,
         profileImage: newMember.photo || null,
         position: 'Member',
+        age: newMember.age,
+        maritalStatus: newMember.maritalStatus,
+        sex: newMember.sex,
+        stateOfOrigin: newMember.stateOfOrigin,
+        localGovernment: newMember.localGovernment,
+        occupation: newMember.occupation,
+        guarantorName: newMember.guarantorName,
       };
 
       await handleAddMember(memberData);
@@ -219,7 +233,6 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
         fullName: '',
         phone: '',
         address: '',
-        totalContributions: 0,
         photo: null,
         photoPreview: null
       });
@@ -379,7 +392,19 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
           ) : (
             <div className="members-grid">
               {filteredMembers.map(member => (
-                <div key={member._id || member.id} className="member-card" onClick={() => setSelectedMember(member)}>
+                <div key={member._id || member.id} className="member-card" onClick={async () => {
+                  try {
+                    const memberResponse = await memberAPI.getById(member._id || member.id);
+                    const payload = memberResponse.data || memberResponse;
+                    const memberObj = payload.member || payload.data?.member || payload.data || payload;
+                    const contributions = payload.contributions || payload.data?.contributions || [];
+                    const loans = payload.loans || payload.data?.loans || [];
+                    setSelectedMember({ ...memberObj, contributions, loans });
+                  } catch (err) {
+                    // fallback to earlier shallow member if fetch fails
+                    setSelectedMember(member);
+                  }
+                }}>
                   <img 
                     src={member.profileImage || defaultPlaceholder} 
                     alt={member.fullName} 
@@ -457,6 +482,12 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
                 </button>
               </div>
               <p className="loan-info">Create and manage loans for this member</p>
+              {/* Small note when member has ongoing loans */}
+              {selectedMember?.loans && selectedMember.loans.some(l => ['disbursed', 'repaying', 'approved', 'pending'].includes(l.status)) && (
+                <p className="loan-note" style={{color: '#b45f00', marginTop: '8px'}}>
+                  ⚠️ Note: This member has ongoing loan(s). Consider saving drafts or partial payments if they cannot pay in full.
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -507,19 +538,34 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
               <input type="text" placeholder="Full Name *" value={newMember.fullName || ''} onChange={(e) => setNewMember({...newMember, fullName: e.target.value})} required />
               <input type="tel" placeholder="Phone *" value={newMember.phone} onChange={(e) => setNewMember({...newMember, phone: e.target.value})} required />
               <input type="text" placeholder="Address *" value={newMember.address} onChange={(e) => setNewMember({...newMember, address: e.target.value})} required />
+              {/* Initial contribution removed — add contributions via Contributions page */}
+              
+              
+              
               <input
                 type="number"
-                min="0"
-                step="0.01"
-                placeholder="Initial Contribution Amount (₦)"
-                value={newMember.totalContributions || ''}
-                onChange={(e) => {
-                  const value = Number(e.target.value);
-                  if (value >= 0) {
-                    setNewMember({...newMember, totalContributions: value});
-                  }
-                }}
+                placeholder="Age"
+                value={newMember.age || ''}
+                onChange={(e) => setNewMember({...newMember, age: e.target.value ? Number(e.target.value) : undefined})}
               />
+              <select value={newMember.maritalStatus || ''} onChange={(e) => setNewMember({...newMember, maritalStatus: e.target.value})}>
+                <option value="">Marital Status</option>
+                <option value="single">Single</option>
+                <option value="married">Married</option>
+                <option value="divorced">Divorced</option>
+                <option value="widowed">Widowed</option>
+                <option value="other">Other</option>
+              </select>
+              <select value={newMember.sex || ''} onChange={(e) => setNewMember({...newMember, sex: e.target.value})}>
+                <option value="">Sex</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
+              <input type="text" placeholder="State of Origin" value={newMember.stateOfOrigin || ''} onChange={(e) => setNewMember({...newMember, stateOfOrigin: e.target.value})} />
+              <input type="text" placeholder="Local Government" value={newMember.localGovernment || ''} onChange={(e) => setNewMember({...newMember, localGovernment: e.target.value})} />
+              <input type="text" placeholder="Occupation" value={newMember.occupation || ''} onChange={(e) => setNewMember({...newMember, occupation: e.target.value})} />
+              <input type="text" placeholder="Guarantor's Name" value={newMember.guarantorName || ''} onChange={(e) => setNewMember({...newMember, guarantorName: e.target.value})} />
 
               <div className="modal-buttons">
                 <button type="submit" className={`btn-primary ${isSubmitting ? 'btn-loading' : ''}`} disabled={isSubmitting}>
@@ -577,19 +623,31 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
               <input type="text" value={selectedMember.fullName} onChange={(e) => setSelectedMember({...selectedMember, fullName: e.target.value})} required />
               <input type="tel" value={selectedMember.phone} onChange={(e) => setSelectedMember({...selectedMember, phone: e.target.value})} required />
               <input type="text" value={selectedMember.address} onChange={(e) => setSelectedMember({...selectedMember, address: e.target.value})} required />
+              {/* totalContributions is managed via Contributions, not editable here */}
               <input
                 type="number"
-                min="0"
-                step="0.01"
-                placeholder="Total Contribution Amount (₦)"
-                value={selectedMember.totalContributions || ''}
-                onChange={(e) => {
-                  const value = Number(e.target.value);
-                  if (value >= 0) {
-                    setSelectedMember({...selectedMember, totalContributions: value});
-                  }
-                }}
+                placeholder="Age"
+                value={selectedMember.age || ''}
+                onChange={(e) => setSelectedMember({...selectedMember, age: e.target.value ? Number(e.target.value) : undefined})}
               />
+              <select value={selectedMember.maritalStatus || ''} onChange={(e) => setSelectedMember({...selectedMember, maritalStatus: e.target.value})}>
+                <option value="">Marital Status</option>
+                <option value="single">Single</option>
+                <option value="married">Married</option>
+                <option value="divorced">Divorced</option>
+                <option value="widowed">Widowed</option>
+                <option value="other">Other</option>
+              </select>
+              <select value={selectedMember.sex || ''} onChange={(e) => setSelectedMember({...selectedMember, sex: e.target.value})}>
+                <option value="">Sex</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
+              <input type="text" placeholder="State of Origin" value={selectedMember.stateOfOrigin || ''} onChange={(e) => setSelectedMember({...selectedMember, stateOfOrigin: e.target.value})} />
+              <input type="text" placeholder="Local Government" value={selectedMember.localGovernment || ''} onChange={(e) => setSelectedMember({...selectedMember, localGovernment: e.target.value})} />
+              <input type="text" placeholder="Occupation" value={selectedMember.occupation || ''} onChange={(e) => setSelectedMember({...selectedMember, occupation: e.target.value})} />
+              <input type="text" placeholder="Guarantor's Name" value={selectedMember.guarantorName || ''} onChange={(e) => setSelectedMember({...selectedMember, guarantorName: e.target.value})} />
 
               <div className="modal-buttons">
                 <button type="submit" className="btn-primary">Save Changes</button>
