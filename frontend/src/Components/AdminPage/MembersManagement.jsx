@@ -38,6 +38,7 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
     localGovernment: '',
     occupation: '',
     guarantorName: '',
+    joinDate: '',
     photo: null,
     photoPreview: null
   });
@@ -225,6 +226,7 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
         localGovernment: newMember.localGovernment,
         occupation: newMember.occupation,
         guarantorName: newMember.guarantorName,
+        joinDate: newMember.joinDate,
       };
 
       await handleAddMember(memberData);
@@ -233,6 +235,7 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
         fullName: '',
         phone: '',
         address: '',
+        joinDate: '',
         photo: null,
         photoPreview: null
       });
@@ -551,10 +554,6 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
                     <span className="info-label">Join Date</span>
                     <span className="info-value">{formatDateTime(selectedMember.joinDate)}</span>
                   </div>
-                  <div className="info-box">
-                    <span className="info-label">Member Since</span>
-                    <span className="info-value">{formatDateTime(selectedMember.createdAt)}</span>
-                  </div>
                 </div>
               </div>
             </div>
@@ -623,6 +622,14 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
               <input type="text" placeholder="Full Name *" value={newMember.fullName || ''} onChange={(e) => setNewMember({...newMember, fullName: e.target.value})} required />
               <input type="tel" placeholder="Phone *" value={newMember.phone} onChange={(e) => setNewMember({...newMember, phone: e.target.value})} required />
               <input type="text" placeholder="Address *" value={newMember.address} onChange={(e) => setNewMember({...newMember, address: e.target.value})} required />
+              <input 
+                type="date" 
+                placeholder="Join Date *" 
+                value={newMember.joinDate} 
+                onChange={(e) => setNewMember({...newMember, joinDate: e.target.value})} 
+                required 
+                title="Date when member joined the cooperative"
+              />
               {/* Initial contribution removed — add contributions via Contributions page */}
               
               
@@ -708,6 +715,12 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
               <input type="text" value={selectedMember.fullName} onChange={(e) => setSelectedMember({...selectedMember, fullName: e.target.value})} required />
               <input type="tel" value={selectedMember.phone} onChange={(e) => setSelectedMember({...selectedMember, phone: e.target.value})} required />
               <input type="text" value={selectedMember.address} onChange={(e) => setSelectedMember({...selectedMember, address: e.target.value})} required />
+              <input 
+                type="date" 
+                value={selectedMember.joinDate ? new Date(selectedMember.joinDate).toISOString().split('T')[0] : ''} 
+                onChange={(e) => setSelectedMember({...selectedMember, joinDate: e.target.value})} 
+                required 
+              />
               {/* totalContributions is managed via Contributions, not editable here */}
               <input
                 type="number"

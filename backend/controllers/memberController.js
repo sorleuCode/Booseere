@@ -100,7 +100,10 @@ const createMember = asyncHandler(async (req, res) => {
       address,
       position,
       profileImage,
+      joinDate,
     } = req.body;
+
+    
     // Additional optional registration fields
     const {
       age,
@@ -116,6 +119,11 @@ const createMember = asyncHandler(async (req, res) => {
     if (!fullName) {
       res.status(400);
       throw new Error('Full name is required');
+    }
+
+    if (!joinDate) {
+      res.status(400);
+      throw new Error('Join date is required');
     }
 
     // Check if member already exists
@@ -187,7 +195,7 @@ const createMember = asyncHandler(async (req, res) => {
       localGovernment,
       occupation,
       guarantorName,
-      joinDate: new Date(),
+      joinDate: joinDate ? new Date(joinDate) : new Date(),
     });
 
     // Initial contributions are no longer created automatically during registration.
