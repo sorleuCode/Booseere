@@ -451,26 +451,111 @@ function MembersManagement({ selectedMember, setSelectedMember }) {
             </div>
 
             <div className="detail-info-grid">
-              <div className="info-box">
-                <span className="info-label">Phone</span>
-                <span className="info-value">{selectedMember.phone}</span>
-              </div>
-              <div className="info-box">
-                <span className="info-label">Address</span>
-                <span className="info-value">{selectedMember.address}</span>
-              </div>
-              <div className="info-box">
-                <span className="info-label">Join Date</span>
-                <span className="info-value">{formatDateTime(selectedMember.joinDate)}</span>
+              {/* Personal Information Section */}
+              <div className="info-section">
+                <h3>👤 Personal Information</h3>
+                <div className="info-grid">
+                  <div className="info-box">
+                    <span className="info-label">Full Name</span>
+                    <span className="info-value">{selectedMember.fullName}</span>
+                  </div>
+                  <div className="info-box">
+                    <span className="info-label">Membership Number</span>
+                    <span className="info-value">{selectedMember.membershipNumber}</span>
+                  </div>
+                  <div className="info-box">
+                    <span className="info-label">Position</span>
+                    <span className="info-value">{selectedMember.position}</span>
+                  </div>
+                  <div className="info-box">
+                    <span className="info-label">Status</span>
+                    <span className={`status-pill ${selectedMember.status?.toLowerCase()}`}>{selectedMember.status}</span>
+                  </div>
+                  <div className="info-box">
+                    <span className="info-label">Phone</span>
+                    <span className="info-value">{selectedMember.phone || 'Not provided'}</span>
+                  </div>
+                  <div className="info-box">
+                    <span className="info-label">Address</span>
+                    <span className="info-value">{selectedMember.address || 'Not provided'}</span>
+                  </div>
+                  <div className="info-box">
+                    <span className="info-label">Age</span>
+                    <span className="info-value">{selectedMember.age || 'Not provided'}</span>
+                  </div>
+                  <div className="info-box">
+                    <span className="info-label">Sex</span>
+                    <span className="info-value">{selectedMember.sex || 'Not provided'}</span>
+                  </div>
+                  <div className="info-box">
+                    <span className="info-label">Marital Status</span>
+                    <span className="info-value">{selectedMember.maritalStatus || 'Not provided'}</span>
+                  </div>
+                </div>
               </div>
 
-              <div className="info-box highlight">
-                <span className="info-label">Total Contributions</span>
-                <span className="info-value big">{formatCurrency(selectedMember.totalContributions || 0)}</span>
+              {/* Location Information Section */}
+              <div className="info-section">
+                <h3>📍 Location Information</h3>
+                <div className="info-grid">
+                  <div className="info-box">
+                    <span className="info-label">State of Origin</span>
+                    <span className="info-value">{selectedMember.stateOfOrigin || 'Not provided'}</span>
+                  </div>
+                  <div className="info-box">
+                    <span className="info-label">Local Government</span>
+                    <span className="info-value">{selectedMember.localGovernment || 'Not provided'}</span>
+                  </div>
+                </div>
               </div>
-              <div className="info-box highlight">
-                <span className="info-label">Total Loans</span>
-                <span className="info-value big">{formatCurrency(selectedMember.totalLoans || 0)}</span>
+
+              {/* Professional Information Section */}
+              <div className="info-section">
+                <h3>💼 Professional Information</h3>
+                <div className="info-grid">
+                  <div className="info-box">
+                    <span className="info-label">Occupation</span>
+                    <span className="info-value">{selectedMember.occupation || 'Not provided'}</span>
+                  </div>
+                  <div className="info-box">
+                    <span className="info-label">Guarantor Name</span>
+                    <span className="info-value">{selectedMember.guarantorName || 'Not provided'}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Financial Information Section */}
+              <div className="info-section">
+                <h3>💰 Financial Information</h3>
+                <div className="info-grid">
+                  <div className="info-box highlight">
+                    <span className="info-label">Total Contributions</span>
+                    <span className="info-value big">{formatCurrency(selectedMember.totalContributions || 0)}</span>
+                  </div>
+                  <div className="info-box highlight">
+                    <span className="info-label">Total Loans</span>
+                    <span className="info-value big">{formatCurrency(selectedMember.totalLoans || 0)}</span>
+                  </div>
+                  <div className="info-box">
+                    <span className="info-label">Outstanding Loan</span>
+                    <span className="info-value">{formatCurrency(selectedMember.outstandingLoan || 0)}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Membership Information Section */}
+              <div className="info-section">
+                <h3>📅 Membership Information</h3>
+                <div className="info-grid">
+                  <div className="info-box">
+                    <span className="info-label">Join Date</span>
+                    <span className="info-value">{formatDateTime(selectedMember.joinDate)}</span>
+                  </div>
+                  <div className="info-box">
+                    <span className="info-label">Member Since</span>
+                    <span className="info-value">{formatDateTime(selectedMember.createdAt)}</span>
+                  </div>
+                </div>
               </div>
             </div>
 
