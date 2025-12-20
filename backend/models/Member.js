@@ -27,7 +27,7 @@ const memberSchema = new mongoose.Schema({
   },
   joinDate: {
     type: Date,
-    default: Date.now,
+    required: true,
   },
   profileImage: {
     type: String,
